@@ -1,5 +1,3 @@
-// you have to install express and body-parser first by npm install ...
-
 var http = require('http');
 var express = require('express');
 var app = express();
