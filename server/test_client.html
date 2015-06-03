@@ -11,29 +11,34 @@
   <input type="button" value="Join!" id="disp" />
 
   <div id="div" style="display:none;background-image:url(http://www.betriebsausstatter24.de/media/catalog/product/cache/1/image/370x/9df78eab33525d08d6e5fb8d27136e95/5/0/50025_3_57.jpg); background-repeat:no-repeat;height:400px;">
-  <p>Input the other's ID</p>
-  <input type="number" value="000000" min = "000000" max = "999999" id="new_id" />
+  <p>Input the other's ID:</p>
+  <input type="number" placeholder="000000" min = "000000" max = "999999" id="new_id" style="width:65px;height:20px;"/>
   <input type="button" value="Submit" id="join" />
-  <p id="message"></p>
   </div>
+  <p id="message" style ="background-color:#ffffff;"></p>
+
   
 	<script>
-	document.getElementById("start").onclick = function() {
-		$.get('http://localhost:5000/start',0,function(id){
-			alert(id);
+	$("#start").click(function() {
+		$.post('http://localhost:5000/action', { action: "start" },function(id){
+			$("#message").text("you ID is " + id);
 		});
-	};
+	});
+	
 	$("#disp").on("click", function() {
 		$( "#div" ).slideDown( "slow", function() {
     	// Animation complete.
   		});
 	});
+	
 	$("#join").click(function() {
-		var new_id = $("new_id").val();
-		$("#message").text("you entered " + new_id);
-		$.get('http://localhost:5000/join',0,function(res){
-			alert(res);
-		});
+		var new_id = $("#new_id").val();
+		if(new_id!=""){
+			$("#message").text("you entered " + new_id);
+			$.post('http://localhost:5000/action', { action: "join" , id: new_id} ,function(res){
+				alert(res);
+			});
+		}
 	});
 	</script>
   </body>
