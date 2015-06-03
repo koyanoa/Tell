@@ -1,5 +1,8 @@
+// you have to install express and body-parser first by npm install ...
+
 var http = require('http');
-var app = require('express')();
+var express = require('express');
+var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 var port = process.env.PORT || 5000;
@@ -8,9 +11,12 @@ var port = process.env.PORT || 5000;
 var server = http.createServer(app).listen(port);
 console.log('HTTP server running on port ' + port);
 
+// make subdirectory public available on localhost to call files
+app.use(express.static(__dirname + '/public'));
+
 // attach BinaryServer to the base http server
 var BinaryServer = require('binaryjs').BinaryServer;
-var bs = new BinaryServer({server: server, path: '/binary-endpoint'});
+var bs = new BinaryServer({server: server, path:'/binary-endpoint'});
 console.log('BinaryServer running');
 
 app.post('/action', function(req, res){
