@@ -43,6 +43,8 @@
 		// failure
 	});
 
+
+    //Function client.on refers to the function(stream, metadat) each time the event 'stream' comes up
     client.on('stream', function(stream, metadat) {
       var parts = [];
       var meta = metadat;
