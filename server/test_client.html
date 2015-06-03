@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test Client</title>
+    <meta charset="utf-8">
+	<script src="jquery-1.11.3.min.js"></script>
+  </head>
+  <body style="background-size:cover">
+
+  <input type="button" value="Start!" id="start" />
+  <input type="button" value="Join!" id="disp" />
+
+  <div id="div" style="display:none;background-image:url(http://www.betriebsausstatter24.de/media/catalog/product/cache/1/image/370x/9df78eab33525d08d6e5fb8d27136e95/5/0/50025_3_57.jpg); background-repeat:no-repeat;height:400px;">
+  <p>Input the other's ID</p>
+  <input type="number" value="000000" min = "000000" max = "999999" id="new_id" />
+  <input type="button" value="Submit" id="join" />
+  <p id="message"></p>
+  </div>
+  
+	<script>
+	document.getElementById("start").onclick = function() {
+		$.get('http://localhost:5000/start',0,function(id){
+			alert(id);
+		});
+	};
+	$("#disp").on("click", function() {
+		$( "#div" ).slideDown( "slow", function() {
+    	// Animation complete.
+  		});
+	});
+	$("#join").click(function() {
+		var new_id = $("new_id").val();
+		$("#message").text("you entered " + new_id);
+		$.get('http://localhost:5000/join',0,function(res){
+			alert(res);
+		});
+	});
+	</script>
+  </body>
