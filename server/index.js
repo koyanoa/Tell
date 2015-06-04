@@ -15,6 +15,7 @@ app.use(express.static(__dirname + '/public'));
 // attach BinaryServer to the base http server
 var BinaryServer = require('binaryjs').BinaryServer;
 var bs = new BinaryServer({server: server, path:'/binary-endpoint'});
+var noFile = new Buffer(0); // for sending only metadata through binaryjs
 console.log('BinaryServer running');
 
 /*app.post('/action', function(req, res){
@@ -34,47 +35,103 @@ console.log('BinaryServer running');
 });*/
 
 // Create 6 digit session IDs
-var id_free = [], // all available IDs
-  id_used = []; // all currently available IDs
+var idFree = [], // all available IDs
+  idUsed = []; // all currently used IDs (not available)
 
 // Generate array with all IDs and shuffle it
 for(var i=0;i<1000000;i++){
-  id_free.push(('00000' + i.toString()).slice(-6));
+  idFree.push(('00000' + i.toString()).slice(-6));
 }
 function shuffle(o){
   for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
   return o;
 }
-shuffle(id_free);
+shuffle(idFree);
 
 // get a random ID from free ID array
 function getID(){
   randindex = Math.round(Math.random()*1000000);
-  var id = id_free[randindex]
-  id_used.push(id);
-  id_free.splice(randindex,1);
+  var id = idFree[randindex]
+  idUsed.push(id);
+  idFree.splice(randindex,1);
   return id;
 }
 
 // make ID available for use again
 function freeID(id){
-	id_free.push(id); // add to array of free IDs
-	id_used.splice(id.indexOf(),1); // remove from array of used IDs
+	idFree.push(id); // add to array of free IDs
+	idUsed.splice(id.indexOf(),1); // remove from array of used IDs
 	return;
+}
+
+var clientsWaiting = [],
+    idWaiting = [],
+    clientsConnectStart = [],
+    clientsConnectJoin = [],
+    startId,
+    joinId;
+
+function logAllArrays(){
+  console.log('------------- new log --------------');
+  console.log('---- Waiting clients\n' + clientsWaiting);
+  console.log('---- Waiting TELL ids\n' + idWaiting);
+  console.log('---- Starter Clients who where matched\n' + clientsConnectStart);
+  console.log('---- Joiner Clients who where matched\n' + clientsConnectJoin);
+  console.log('---- TELL ids that are used\n' + idUsed);
+}
+
+function inArray(arr, el){
+  return (arr.indexOf(el) != -1);
 }
 
 // wait for new user connections
 bs.on('connection', function(client) {
   console.log('client -JOIN- event; client id ' + client.id);
+  
+  function forwardStream(){}
+  
   // incoming stream from browser
   client.on('stream', function(stream, meta) {
-  console.log('stream on');
-  if (meta.action == 'start') {
-    var newId = getID();
-    console.log('id ' + newID + ' generated');
-    bs.send(null, { action: 'id', value: newId });
-    console.log('id sent');
-  }
+    
+    switch (meta.action) {
+      case 'start':
+        if (!inArray(clientsWaiting, client.id)){
+          startId = getID();
+          client.send(noFile, { action: 'id', value: startId });
+          clientsWaiting.push(client.id);
+          idWaiting.push(startId);
+        }
+        logAllArrays();
+        break;
+      
+      case 'join':
+        console.log('join request');
+        joinId = meta.value;
+        console.log('with id ' + joinId);
+        if (inArray(idWaiting,joinId)) {
+          console.log('MATCH');
+          var idx = idWaiting.indexOf(joinId);
+          // add BinaryJS client ids to arrays of matched clients
+          clientsConnectJoin.push(client.id);
+          clientsConnectStart.push(clientsWaiting[idx]);
+          // remove BinaryJS id and TELL id from waiting arrays
+          clientsWaiting.splice(idx,1);
+          idWaiting.splice(idx,1);
+          // make TELL id available again
+          freeID(joinId);
+        }
+        
+        logAllArrays();
+        break;
+      
+      case 'pubkey':
+        forwardStream();
+        break;
+      
+      case 'file':
+        forwardStream();
+        break;
+    }
   // broadcast to all other clients
   /*for(var id in bs.clients) {
     var otherClient = bs.clients[id];
@@ -84,8 +141,16 @@ bs.on('connection', function(client) {
 	    }
     }*/
   });
+  
 	client.on('close', function(){
     console.log('client -CLOSE- event; client id ' + client.id);
+    if (inArray(clientsWaiting, client.id)){
+      var idx = Number(clientsWaiting.indexOf(client.id));
+      clientsWaiting.splice(idx,1);
+      idWaiting.splice(idx,1);
+    }
+    console.log(clientsWaiting);
+    console.log(idWaiting);
 	});
 });
 
