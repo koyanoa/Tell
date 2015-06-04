@@ -87,11 +87,30 @@ function inArray(arr, el){
 // wait for new user connections
 bs.on('connection', function(client) {
   console.log('client -JOIN- event; client id ' + client.id);
-  
-  function forwardStream(){}
-  
+    
   // incoming stream from browser
   client.on('stream', function(stream, meta) {
+  
+    function forwardStream(){
+      if (inArray(clientsConnectJoin,client.id) || inArray(clientsConnectStart,client.id)){
+        var otherClient, idx;
+        if (inArray(clientsConnectJoin,client.id)){
+          idx = clientsConnectJoin.indexOf(client.id);
+          otherClient = bs.clients[clientsConnectStart[idx]];
+        }
+        else {
+          idx = clientsConnectStart.indexOf(client.id);
+          otherClient = bs.clients[clientsConnectJoin[idx]];
+        }
+        var send = otherClient.createStream(meta);
+        stream.pipe(send);
+        console.log(' --> data sent');
+        }
+        else {
+          // forwarding failed. probably clients not matched yet.
+          console.log('forwarding failed');
+        }
+    }
     
     switch (meta.action) {
       case 'start':
@@ -105,11 +124,9 @@ bs.on('connection', function(client) {
         break;
       
       case 'join':
-        console.log('join request');
         joinId = meta.value;
-        console.log('with id ' + joinId);
         if (inArray(idWaiting,joinId)) {
-          console.log('MATCH');
+          console.log('---> MATCH');
           var idx = idWaiting.indexOf(joinId);
           // add BinaryJS client ids to arrays of matched clients
           clientsConnectJoin.push(client.id);
@@ -119,8 +136,11 @@ bs.on('connection', function(client) {
           idWaiting.splice(idx,1);
           // make TELL id available again
           freeID(joinId);
+          // send to client that he was successfully matched
+          client.send(noFile, { action: 'status', value: true });
         }
-        
+        // send to client that he was not matched
+        else client.send(noFile, { action: 'status', value: false });
         logAllArrays();
         break;
       
@@ -132,14 +152,6 @@ bs.on('connection', function(client) {
         forwardStream();
         break;
     }
-  // broadcast to all other clients
-  /*for(var id in bs.clients) {
-    var otherClient = bs.clients[id];
-    if(otherClient != client) {
-      var send = otherClient.createStream(meta);
-      stream.pipe(send);
-	    }
-    }*/
   });
   
 	client.on('close', function(){
