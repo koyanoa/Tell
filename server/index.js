@@ -6,7 +6,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 var port = process.env.PORT || 5000;
 
 // create a server with the express app as a listener
-var server = http.createServer(app).listen(port);
+var server = http.createServer(app)
 console.log('HTTP server running on port ' + port);
 
 // make subdirectory public available on localhost to call files
@@ -81,3 +81,6 @@ bs.on('connection', function(client) {
 	}
     });
 });
+
+
+server.listen(port);
