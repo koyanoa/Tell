@@ -154,6 +154,8 @@ bs.on('connection', function(client) {
     }
   });
   
+  
+  // Still to do: implement freeing of clientsConnectJoin and clientsConnectStart when disconnecting
 	client.on('close', function(){
     console.log('client -CLOSE- event; client id ' + client.id);
     if (inArray(clientsWaiting, client.id)){
@@ -161,8 +163,7 @@ bs.on('connection', function(client) {
       clientsWaiting.splice(idx,1);
       idWaiting.splice(idx,1);
     }
-    console.log(clientsWaiting);
-    console.log(idWaiting);
+    logAllArrays();
 	});
 });
 
