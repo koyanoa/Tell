@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Encrypt file</title>
+    <meta charset="utf-8">
+		<script src="../client/openpgp.js"></script>
+    <script src="../client/binary.js"></script>
+		<script type="text/javascript" src="../client/jquery-1.11.3.min.js"></script>
+		<script>
+			var openpgp = window.openpgp;
+	    var bc = new BinaryClient('ws://localhost:5000');
+
+			var privKey, pubKey, remotePubKey;
+
+			function log(str) {
+				$('#log').append(str + '<br />');
+			}
+
+			// Array buffer <-> Binary string conversion for OpenPGP.js
+			function ab2str(buf) {
+				return String.fromCharCode.apply(null, new Uint8Array(buf));
+			}
+
+			function str2ab(str) {
+				var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+				var bufView = new Uint8Array(buf);
+				for (var i=0, strLen=str.length; i<strLen; i++) {
+					bufView[i] = str.charCodeAt(i);
+				}
+				return buf;
+			}
+
+			function bytesToSize(bytes) {
+					var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+					if (bytes == 0) return 'n/a';
+					var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+					if (i == 0) return bytes + ' ' + sizes[i]; 
+					return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+			};
+
+			// Generate keypair on page loading
+			var options = {
+				numBits: 2048,
+				userId: 'Tell-Now.com',
+				unlocked: true,
+			};
+
+			openpgp.generateKeyPair(options).then(function(keypair) {
+				privKey = keypair.key;
+				pubKey = privKey.toPublic();
+				log("Generated key: " + privKey.primaryKey.fingerprint);
+
+				// Announce public key over BinaryJS connection
+				/*
+					 Keys are small and sent in one chunk, thus we can send as
+					 ArrayBuffer instead of a Blob
+				*/
+				var data = str2ab(pubKey.toPacketlist().write());
+				bc.send(data, "pubKey");
+			}).catch(function(error) {
+				alert("Failed to generate keypair!");
+			});
+
+			bc.on('stream', function(stream, meta){
+				// collect stream data
+				var parts = [];
+				stream.on('data', function(data){
+					parts.push(data);
+				});
+
+				stream.on('end', function(){
+					if (meta == "pubKey") {
+						// Read remote public key
+						var packetlist = new openpgp.packet.List();
+						packetlist.read(ab2str(parts[0]));
+						remotePubKey = new openpgp.key.Key(packetlist);
+						log("Received key: " + remotePubKey.primaryKey.fingerprint);
+
+					} else if (meta == "file") {
+						// Decrypt and verify received file
+						log("Decrypt...");
+
+						var reader = new FileReader();
+						reader.onloadend = function() {
+							var packetlist = new openpgp.packet.List();
+							packetlist.read(reader.result);
+
+							var msg = new openpgp.message.Message(packetlist);
+							msg = msg.decrypt(privKey);
+
+							var name = msg.packets[1].getFilename();
+
+							var verified = msg.verify([remotePubKey])[0].valid
+							log("verified: " + verified);
+
+							// Display verified file in browser
+							if (verified == true) {
+								var data = new Blob([str2ab(msg.getLiteralData())], {type : 'application/octet-stream'});
+								var size = bytesToSize(data.size);
+								var url = (window.URL || window.webkitURL).createObjectURL(data);
+								$('#files ul').append(
+										$('<li>').append(
+										  $('<a>').attr({'href': url, 'download': name}).text(name)
+										).append(" (" + size + ")")
+								);
+							}
+						}
+
+						reader.readAsBinaryString(new Blob(parts));
+					}
+				});
+			});
+
+			$(document).ready(function(){
+				$( "#fileInput" ).on("change", function() {
+					// Sign, encrypt and send selected file
+					var file = $('#fileInput').prop('files')[0];
+					var name = file.name;
+
+					var reader = new FileReader();
+					reader.onloadend = function () {
+						log("Encrypt...");
+						var msg = openpgp.message.fromBinary(reader.result);
+						msg.packets[0].setFilename(name);
+						msg = msg.sign([privKey]).encrypt([remotePubKey]);
+
+						var data = new Blob([str2ab(msg.packets.write())]);
+						bc.send(data, "file");
+					}
+
+					reader.readAsBinaryString(file);
+				});
+			});
+		</script>
+			
+  </head>
+  <body>
+	<div>
+		Select file:
+		<input type="file" id="fileInput"/>
+	</div>
+	<div id="log"></div>
+
+	<div id="files">
+		<ul></ul>
+	</div>
+
+  </body>
+</html>
