@@ -17,7 +17,7 @@ var BinaryServer = require('binaryjs').BinaryServer;
 var bs = new BinaryServer({server: server, path:'/binary-endpoint'});
 console.log('BinaryServer running');
 
-app.post('/action', function(req, res){
+/*app.post('/action', function(req, res){
 	var action = req.body.action;
 	console.log('--------- New ' + action + ' requested ----------');
 	if (action == 'start'){
@@ -31,29 +31,29 @@ app.post('/action', function(req, res){
 		res.send('Trying to connect you. The ID you send is ' + join_id);
 	}
 	else console.log('Problem recognizing action');
-});
+});*/
 
 // Create 6 digit session IDs
 var id_free = [], // all available IDs
-	id_used = []; // all currently available IDs
+  id_used = []; // all currently available IDs
 
 // Generate array with all IDs and shuffle it
 for(var i=0;i<1000000;i++){
-	id_free.push(('00000' + i.toString()).slice(-6));
+  id_free.push(('00000' + i.toString()).slice(-6));
 }
 function shuffle(o){
-    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-    return o;
+  for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+  return o;
 }
 shuffle(id_free);
 
 // get a random ID from free ID array
 function getID(){
-	randindex = Math.round(Math.random()*1000000);
-	var id = id_free[randindex]
-	id_used.push(id);
-	id_free.splice(randindex,1);
-	return id;
+  randindex = Math.round(Math.random()*1000000);
+  var id = id_free[randindex]
+  id_used.push(id);
+  id_free.splice(randindex,1);
+  return id;
 }
 
 // make ID available for use again
@@ -65,21 +65,28 @@ function freeID(id){
 
 // wait for new user connections
 bs.on('connection', function(client) {
-	console.log('--------- CLIENT ----------');
-	console.log(client);
-    // incoming stream from browser
-    client.on('stream', function(stream, meta) {
-	// broadcast to all other clients
-	console.log('New client online. Got id ' + client.id);
-
-	for(var id in bs.clients) {
-	    var otherClient = bs.clients[id];
-	    if(otherClient != client) {
-		var send = otherClient.createStream(meta);
-		stream.pipe(send);
+  console.log('client -JOIN- event; client id ' + client.id);
+  // incoming stream from browser
+  client.on('stream', function(stream, meta) {
+  console.log('stream on');
+  if (meta.action == 'start') {
+    var newId = getID();
+    console.log('id ' + newID + ' generated');
+    bs.send(null, { action: 'id', value: newId });
+    console.log('id sent');
+  }
+  // broadcast to all other clients
+  /*for(var id in bs.clients) {
+    var otherClient = bs.clients[id];
+    if(otherClient != client) {
+      var send = otherClient.createStream(meta);
+      stream.pipe(send);
 	    }
-	}
-    });
+    }*/
+  });
+	client.on('close', function(){
+    console.log('client -CLOSE- event; client id ' + client.id);
+	});
 });
 
 
