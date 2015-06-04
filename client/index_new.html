@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Stream file</title>
+    <meta charset="utf-8">
+    <script src="binary.js"></script>
+		<script src="openpgp.js"></script>
+		<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="tell.js"></script>
+  </head>
+  <body>
+	<div id="select">
+		<input type="button" value="Start" id="startButton" />
+		<input type="button" value="Join" id="joinButton" />
+	</div>
+
+	<div id="start">
+		Your number: <span id="id" ></span><br />
+		Call recipient!
+	</div>
+
+	<div id="join">
+		<input type="number" min="0" max="999999" id="idInput" />
+		<input type="button" value="connect" id="connectButton" />
+	</div>
+
+	<div id="keys">
+		Your key: <span id="privKey"></span><br />
+		Remote key: <span id="pubKey"></span>
+	</div>
+
+
+	<div id="files">
+		Select file:
+		<input type="file" id="fileInput"/>
+		<button type="button" id="sendFile" >Send</button>
+
+		Received file:
+		<ul></ul>
+	</div>
+
+	
+	<div id="log"><div>
+  </body>
+</html>
