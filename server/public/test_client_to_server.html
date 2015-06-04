@@ -13,7 +13,7 @@
   <input type="button" value="Join!" id="disp" />
   <input type="file" id="fileinput" accept="image/*" capture="camera" />
 
-  <div id="div" style="display:none;background-image:url(http://www.betriebsausstatter24.de/media/catalog/product/cache/1/image/370x/9df78eab33525d08d6e5fb8d27136e95/5/0/50025_3_57.jpg); background-repeat:no-repeat;height:400px;">
+  <div id="div" style="display:none;background-image:url(http://www.betriebsausstatter24.de/media/catalog/product/cache/1/image/370x/9df78eab33525d08d6e5fb8d27136e95/5/0/50025_3_57.jpg); background-repeat:no-repeat;height:300px;">
   <p>Input the other's ID:</p>
   <input type="number" placeholder="000000" min = "000000" max = "999999" id="new_id" style="width:65px;height:20px;"/>
   <input type="button" value="Submit" id="join" />
@@ -60,9 +60,9 @@
 	$("#join").click(function() {
 		var new_id = $("#new_id").val();
 		if(new_id!=""){
-			$("#message").text("you entered " + new_id);
 			$.post('http://localhost:5000/action', { action: "join" , id: new_id} ,function(res){
-				alert(res);
+				$("#message").text("Server response:  " + res);
+
 			});
 		}
 	});

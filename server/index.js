@@ -65,10 +65,10 @@ function freeID(id){
 
 // wait for new user connections
 bs.on('connection', function(client) {
-
+	console.log('--------- CLIENT ----------');
+	console.log(client);
     // incoming stream from browser
     client.on('stream', function(stream, meta) {
-
 	// broadcast to all other clients
 	console.log('New client online. Got id ' + client.id);
 
