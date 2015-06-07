@@ -1,19 +1,20 @@
 var bcUrl = 'ws://localhost:5000/binary-endpoint';
 
-var openpgp = window.openpgp;
-
 var privKey, pubKey, remotePubKey;
 
 var noFile = new ArrayBuffer(0);
-var timeOut = 100;
+
+var w;
+
+var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
+    RANDOM_SEED_REQUEST = 20000; // random bytes seeded after worker request
+
 
 function status(msg) {
-  if (!msg) msg = '';
-
-  setTimeout(function() {
-    $('#status').text(msg)
-  } ,0);
   console.log(msg);
+
+  if (msg == 'finished') msg = '';
+  $('#status').text(msg)
 }
 
 // Array buffer <-> Binary string conversion for OpenPGP.js
@@ -47,35 +48,10 @@ function initiate() {
 
   bc.on('open', function(){
     $( "#fileInput" ).on("change", function() {
-      // Sign, encrypt and send selected file
-      var file = $('#fileInput').prop('files')[0];
-      var name = file.name;
-
-      var reader = new FileReader();
-      reader.onloadend = function () {
-        var msg = openpgp.message.fromBinary(reader.result);
-        msg.packets[0].setFilename(name);
-        
-        status("Sign...");
-        setTimeout(function() {
-          msg = msg.sign([privKey]);
-          
-          status("Encrypt...");
-          setTimeout(function() {
-            msg = msg.encrypt([remotePubKey]);
-
-            status("Send...");
-            var data = new Blob([str2ab(msg.packets.write())]);
-            var tx = 0;
-            var stream = bc.send(data, { action: 'file' });
-            stream.on('data', function(data) {
-              status(Math.round(tx+=data.rx*100) + '% complete');
-            });
-          }, timeOut);
-        }, timeOut);
-      }
-
-      reader.readAsBinaryString(file);
+      w.postMessage({
+        action: 'encrypt',
+        files: $('#fileInput').prop('files'),
+      });
     });
   });
 
@@ -101,6 +77,7 @@ function initiate() {
           remotePubKey = new openpgp.key.Key(packetlist);
 
           $('#remotePubKey').text(remotePubKey.primaryKey.fingerprint);
+          initWorker();
           break;
         case 'status':
           // Announce public key over BinaryJS connection
@@ -114,46 +91,64 @@ function initiate() {
           }
           break;
         case 'file':
-            // Decrypt and verify received file
-            var reader = new FileReader();
-            reader.onloadend = function() {
-              var packetlist = new openpgp.packet.List();
-              packetlist.read(reader.result);
-
-              var msg = new openpgp.message.Message(packetlist);
-
-              status("Decrypt...");
-              setTimeout(function() {
-                msg = msg.decrypt(privKey);
-
-                var name = msg.packets[1].getFilename();
-
-                status("Verify...");
-                setTimeout(function() {
-                  var verified = msg.verify([remotePubKey])[0].valid
-                  console.log("verified: " + verified);
-                  status();
-
-                  // Display verified file in browser
-                  if (verified == true) {
-                    var data = new Blob([str2ab(msg.getLiteralData())], {type : 'application/octet-stream'});
-                    var size = bytesToSize(data.size);
-                    var url = (window.URL || window.webkitURL).createObjectURL(data);
-                    $('#files ul').append(
-                        $('<li>').append(
-                          $('<a>').attr({'href': url, 'download': name}).text(name)
-                        ).append(" (" + size + ")")
-                    );
-                  }
-                }, timeOut);
-              }, timeOut);
-            }
-            reader.readAsBinaryString(new Blob(parts));
+          w.postMessage({
+            action: 'decrypt',
+            data: parts
+          }, parts);
           break;
       }
     });
   });
 }
+
+function initWorker() {
+  w = new Worker('js/tell.worker.js');
+
+  w.onmessage = function (event, data) {
+    var msg = event.data;
+
+    switch (msg.action) {
+      case 'encrypted':
+        var stream = bc.send(msg.data, { action: 'file' });
+        stream.on('close', function(){
+          status('finished');
+        });
+        break;
+      case 'decrypted':
+        var data = new Blob([ msg.data ], {type : 'application/octet-stream'});
+        var name = msg.name;
+        var size = bytesToSize(data.size);
+        var url = (window.URL || window.webkitURL).createObjectURL(data);
+        $('#files ul').append(
+            $('<li>').append(
+              $('<a>').attr({'href': url, 'download': name}).text(name)
+            ).append(" (" + size + ")")
+        );
+        break;
+      case 'request-seed':
+        seedRandom(RANDOM_SEED_REQUEST);
+        break;
+      case 'status':
+        status(msg.value);
+        break;
+    }
+  }
+
+  function seedRandom(size) {
+    var buf = new Uint8Array(size);
+    window.openpgp.crypto.random.getRandomValues(buf);
+    w.postMessage({action: 'seed-random', buf: buf});
+  };
+
+  seedRandom(INITIAL_RANDOM_SEED);
+  w.postMessage({
+    action: 'keys',
+    privKey: privKey.toPacketlist(),
+    remotePubKey: remotePubKey.toPacketlist(),
+  });
+}
+  
+   
 
 function generateKeyPair() {
   status('Generating keypair...');
@@ -165,17 +160,20 @@ function generateKeyPair() {
   };
 
   openpgp.generateKeyPair(options).then(function(keypair) {
-    status();
+    status('finished');
 
     privKey = keypair.key;
     pubKey = privKey.toPublic();
 
     // Display fingerprint
     $("#privKey").text(privKey.primaryKey.fingerprint);
-  
-  }).catch(function(error) {
-    alert("Failed to generate keypair!");
-  });
+
+    // For local testing
+    /*
+    remotePubKey = pubKey;
+    initWorker();
+    */
+  })
 }
 
 

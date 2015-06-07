@@ -4,7 +4,7 @@
     <title>Stream file</title>
     <meta charset="utf-8">
     <script type="text/javascript" src="js/binary.min.js"></script>
-		<script type="text/javascript" src="js/openpgp.min.js"></script>
+		<script type="text/javascript" src="js/openpgp.js"></script>
 		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
 		<script type="text/javascript" src="js/tell.js"></script>
   </head>
@@ -23,8 +23,8 @@
 
 	<div id="files">
 		Select file:
-		<input type="file" id="fileInput"/>
-		<button type="button" id="sendFile" >Send</button>
+		<input type="file" id="fileInput" multiple="" />
+    (Max. filesize 20 MiB)
     <br />
 		Received file:
 		<ul></ul>
