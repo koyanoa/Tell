@@ -128,23 +128,27 @@ bs.on('connection', function(client) {
         if (inArray(idWaiting,joinId)) {
           console.log('---> MATCH');
           var idx = idWaiting.indexOf(joinId);
+          var matchId = clientsWaiting[idx];
           // add BinaryJS client ids to arrays of matched clients
           clientsConnectJoin.push(client.id);
-          clientsConnectStart.push(clientsWaiting[idx]);
+          clientsConnectStart.push(matchId);
           // remove BinaryJS id and TELL id from waiting arrays
           clientsWaiting.splice(idx,1);
           idWaiting.splice(idx,1);
           // make TELL id available again
           freeID(joinId);
           // send to client that he was successfully matched
+          console.log(idx);
+          console.log(matchId);
           client.send(noFile, { action: 'status', value: true });
+          bs.clients[matchId].send(noFile, { action: 'status', value: true });
         }
         // send to client that he was not matched
         else client.send(noFile, { action: 'status', value: false });
         logAllArrays();
         break;
       
-      case 'pubkey':
+      case 'pubKey':
         forwardStream();
         break;
       

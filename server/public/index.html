@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Stream file</title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="js/binary.min.js"></script>
+		<script type="text/javascript" src="js/openpgp.min.js"></script>
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="js/tell.js"></script>
+  </head>
+  <body>
+	<div >
+    <input type="button" value="Start" id="startButton" />
+		Your number: <span id="id" ></span><br />
+		<input type="number" min="0" max="999999" id="idInput" />
+		<input type="button" value="connect" id="connectButton" />
+	</div>
+
+	<div id="keys">
+		Your key: <span id="privKey"></span><br />
+		Remote key: <span id="remotePubKey"></span>
+	</div>
+
+	<div id="files">
+		Select file:
+		<input type="file" id="fileInput"/>
+		<button type="button" id="sendFile" >Send</button>
+    <br />
+		Received file:
+		<ul></ul>
+	</div>
+
+	
+	<div id="log">
+    <span id="status"></span>
+  <div>
+  </body>
+</html>
