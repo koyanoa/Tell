@@ -1,7 +1,7 @@
 Install
 =======
 
-$ npm install binaryjs
+$ npm install binaryjs express
 
 
 
