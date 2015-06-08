@@ -9,7 +9,7 @@ var port = process.env.PORT || 5000;
 var server = http.createServer(app)
 console.log('HTTP server running on port ' + port);
 
-// make subdirectory public available on localhost to call files
+// make subdirectory public available on server to call files
 app.use(express.static(__dirname + '/public'));
 
 // attach BinaryServer to the base http server
@@ -60,24 +60,24 @@ function getID(){
 // make ID available for use again
 function freeID(id){
 	idFree.push(id); // add to array of free IDs
-	idUsed.splice(id.indexOf(),1); // remove from array of used IDs
+	idUsed.splice(idUsed.indexOf(id),1); // remove from array of used IDs
 	return;
 }
 
 var clientsWaiting = [],
     idWaiting = [],
-    clientsConnectStart = [],
-    clientsConnectJoin = [],
+    clientsMatchStart = [],
+    clientsMatchJoin = [],
     startId,
     joinId;
 
 function logAllArrays(){
   console.log('------------- new log --------------');
-  console.log('---- Waiting clients\n' + clientsWaiting);
-  console.log('---- Waiting TELL ids\n' + idWaiting);
-  console.log('---- Starter Clients who where matched\n' + clientsConnectStart);
-  console.log('---- Joiner Clients who where matched\n' + clientsConnectJoin);
-  console.log('---- TELL ids that are used\n' + idUsed);
+  console.log(' ---- Waiting clients\n' + clientsWaiting);
+  console.log(' ---- Waiting TELL ids\n' + idWaiting);
+  console.log(' ---- Matched Starter clients\n' + clientsMatchStart);
+  console.log(' ---- Matched Joiner clients\n' + clientsMatchJoin);
+  console.log(' ---- TELL ids that are used\n' + idUsed);
 }
 
 function inArray(arr, el){
@@ -92,24 +92,24 @@ bs.on('connection', function(client) {
   client.on('stream', function(stream, meta) {
   
     function forwardStream(){
-      if (inArray(clientsConnectJoin,client.id) || inArray(clientsConnectStart,client.id)){
+      if (inArray(clientsMatchJoin,client.id) || inArray(clientsMatchStart,client.id)){
         var otherClient, idx;
-        if (inArray(clientsConnectJoin,client.id)){
-          idx = clientsConnectJoin.indexOf(client.id);
-          otherClient = bs.clients[clientsConnectStart[idx]];
+        if (inArray(clientsMatchJoin,client.id)){
+          idx = clientsMatchJoin.indexOf(client.id);
+          otherClient = bs.clients[clientsMatchStart[idx]];
         }
         else {
-          idx = clientsConnectStart.indexOf(client.id);
-          otherClient = bs.clients[clientsConnectJoin[idx]];
+          idx = clientsMatchStart.indexOf(client.id);
+          otherClient = bs.clients[clientsMatchJoin[idx]];
         }
         var send = otherClient.createStream(meta);
         stream.pipe(send);
-        console.log(' --> data sent');
-        }
-        else {
-          // forwarding failed. probably clients not matched yet.
-          console.log('forwarding failed');
-        }
+        console.log(' --> Forwarding successful');
+      }
+      else {
+        // forwarding failed. clients not matched yet, or one went offline.
+        console.log(' --> Forwarding failed');
+      }
     }
     
     switch (meta.action) {
@@ -126,46 +126,67 @@ bs.on('connection', function(client) {
       case 'join':
         joinId = meta.value;
         if (inArray(idWaiting,joinId)) {
-          console.log('---> MATCH');
           var idx = idWaiting.indexOf(joinId);
           var matchId = clientsWaiting[idx];
           // add BinaryJS client ids to arrays of matched clients
-          clientsConnectJoin.push(client.id);
-          clientsConnectStart.push(matchId);
+          clientsMatchJoin.push(client.id);
+          clientsMatchStart.push(matchId);
           // remove BinaryJS id and TELL id from waiting arrays
           clientsWaiting.splice(idx,1);
           idWaiting.splice(idx,1);
+          // in case the other client also requested a Tell id, remove him as well from waiting arrays
+          if (inArray(clientsWaiting,client.id)){
+            var idx = clientsWaiting.indexOf(client.id);
+            clientsWaiting.splice(idx,1);
+            freeID(idWaiting[idx]);
+            idWaiting.splice(idx,1);
+          }
           // make TELL id available again
           freeID(joinId);
           // send to client that he was successfully matched
-          console.log(idx);
-          console.log(matchId);
           client.send(noFile, { action: 'status', value: true });
           bs.clients[matchId].send(noFile, { action: 'status', value: true });
         }
         // send to client that he was not matched
         else client.send(noFile, { action: 'status', value: false });
+        
         logAllArrays();
         break;
       
       case 'pubKey':
+        console.log(' -> Forwarding PubKey');
         forwardStream();
         break;
       
       case 'file':
+        console.log(' -> Forwarding file');
         forwardStream();
         break;
     }
   });
   
   
-  // Still to do: implement freeing of clientsConnectJoin and clientsConnectStart when disconnecting
+  // Still to do: implement freeing of clientsMatchJoin and clientsMatchStart when disconnecting
 	client.on('close', function(){
-    console.log('client -CLOSE- event; client id ' + client.id);
+    // remove from arrays if not yet matched
     if (inArray(clientsWaiting, client.id)){
-      var idx = Number(clientsWaiting.indexOf(client.id));
+      var idx = clientsWaiting.indexOf(client.id);
       clientsWaiting.splice(idx,1);
+      freeID(idWaiting[idx]);
       idWaiting.splice(idx,1);
+    }
+    // remove from arrays if already matched
+    if (inArray(clientsMatchJoin, client.id)){
+      var idx = clientsMatchJoin.indexOf(client.id);
+      bs.clients[clientsMatchStart[idx]].send(noFile, { action: 'status', value: false });
+      clientsMatchJoin.splice(idx,1);
+      clientsMatchStart.splice(idx,1);
+    }
+    else if (inArray(clientsMatchStart, client.id)){
+      var idx = clientsMatchStart.indexOf(client.id);
+      bs.clients[clientsMatchJoin[idx]].send(noFile, { action: 'status', value: false });
+      clientsMatchJoin.splice(idx,1);
+      clientsMatchStart.splice(idx,1);
     }
     logAllArrays();
 	});
