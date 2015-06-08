@@ -145,10 +145,10 @@ bs.on('connection', function(client) {
           freeID(joinId);
           // send to client that he was successfully matched
           client.send(noFile, { action: 'status', value: true });
-          bs.clients[matchId].send(noFile, { action: 'status', value: true });
+          bs.clients[matchId].send(noFile, { action: 'match', value: true });
         }
         // send to client that he was not matched
-        else client.send(noFile, { action: 'status', value: false });
+        else client.send(noFile, { action: 'match', value: false });
         
         logAllArrays();
         break;
@@ -178,13 +178,13 @@ bs.on('connection', function(client) {
     // remove from arrays if already matched
     if (inArray(clientsMatchJoin, client.id)){
       var idx = clientsMatchJoin.indexOf(client.id);
-      bs.clients[clientsMatchStart[idx]].send(noFile, { action: 'status', value: false });
+      bs.clients[clientsMatchStart[idx]].send(noFile, { action: 'close' });
       clientsMatchJoin.splice(idx,1);
       clientsMatchStart.splice(idx,1);
     }
     else if (inArray(clientsMatchStart, client.id)){
       var idx = clientsMatchStart.indexOf(client.id);
-      bs.clients[clientsMatchJoin[idx]].send(noFile, { action: 'status', value: false });
+      bs.clients[clientsMatchJoin[idx]].send(noFile, { action: 'close' });
       clientsMatchJoin.splice(idx,1);
       clientsMatchStart.splice(idx,1);
     }
