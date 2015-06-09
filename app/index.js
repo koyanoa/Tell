@@ -115,6 +115,12 @@ bs.on('connection', function(client) {
         if (inArray(idWaiting,joinId)) {
           var idx = idWaiting.indexOf(joinId);
           var matchId = clientsWaiting[idx];
+//-> to finish          // catch if client enters his own TELL id
+          if (matchId == client.id) {
+            if (log) console.log('Client tried to connect to itself');
+            client.send(noFile, { action: 'error', value: 'id' });
+            break;
+          }
           // add BinaryJS client ids to arrays of matched clients
           clientsMatchJoin.push(client.id);
           clientsMatchStart.push(matchId);

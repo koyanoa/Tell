@@ -90,7 +90,6 @@ function initiate() {
 
           initWorker();
           break;
-        case 'status':
         case 'match':
           // Announce public key over BinaryJS connection
           /*
@@ -197,7 +196,8 @@ $(document).ready(function() {
     bc.send(noFile, { action: 'join', value: id })
   });
 
-  $( "#fileSendButton" ).click(function() {
+  $('#fileSendButton').click(function() {
+    $('#fileSendButton').attr('disabled', true);
     w.postMessage({
       action: 'encrypt',
       files: $('#fileInput').prop('files'),
