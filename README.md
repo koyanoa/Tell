@@ -24,7 +24,8 @@ http://openpgpjs.org/openpgpjs/doc/
 | meta action | meta value | file |
 | ----------- | ---------- | ---- |
 | id          | id         | -    |
-| match       | true/false | -    |
+| match       | -          | -    |
+| error       | 'id'/'overload'| -    |
 | close       | -          | -    |
 
 * Client to Server
