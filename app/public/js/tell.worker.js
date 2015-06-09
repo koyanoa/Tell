@@ -67,7 +67,7 @@ self.onmessage = function (event, data) {
 
           status("Send...");
           var data = str2ab(msg.packets.write());
-          response({ action: 'encrypted', data: data }, [data]);
+          response({ action: 'encrypted', name: name, size: file.size, data: data }, [data]);
 
           workingFilename = '';
           status('finished');
