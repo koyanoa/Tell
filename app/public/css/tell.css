@@ -67,7 +67,7 @@ body {
   }
   /* Start the vertical centering */
   .site-wrapper-inner {
-    vertical-align: middle;
+    padding-top: 50px;
   }
   /* Handle the widths */
   .masthead,
@@ -90,8 +90,8 @@ body {
 }
 
 .file-list {
-  overflow: scroll;      
-  height: 200px;            //  <-- Select the height of the body
+  overflow: auto;      
+  height: 200px;
 }
 
 
@@ -118,4 +118,8 @@ body {
 input[readonly] {
   background-color: white !important;
   cursor: text !important;
+}
+
+.dummy {
+  display: none;
 }
