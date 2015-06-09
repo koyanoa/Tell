@@ -56,7 +56,8 @@ self.onmessage = function (event, data) {
 
         reader.onloadend = function () {
           var msg = window.openpgp.message.fromBinary(reader.result);
-          msg.packets[0].setFilename(name);
+          meta = JSON.stringify({ name: name, type: file.type});
+          msg.packets[0].setFilename(meta);
           workingFilename = name;
           
           status("Sign...");
@@ -97,20 +98,18 @@ self.onmessage = function (event, data) {
         status('decrypt');
         msg = msg.decrypt(privKey);
 
-        var name = msg.packets[1].getFilename();
-        workingFilename = name;
+        var meta = JSON.parse(msg.packets[1].getFilename());
 
         status('verify');
         var verified = msg.verify([remotePubKey])[0].valid
         console.log("verified: " + verified);
         
-        workingFilename = '';
         status('decrypted');
 
         // Display verified file in browser
         if (verified == true) {
           var data = str2ab(msg.getLiteralData());
-          response({ action: 'decrypted', name: name, data: data }, [data]);
+          response({ action: 'decrypted', name: meta.name, type: meta.type, data: data }, [data]);
         }
       }
       reader.readAsBinaryString(new Blob(msg.data));
@@ -126,8 +125,5 @@ function response(event, data) {
 
 
 function status(msg) {
-  if (workingFilename)
-    msg = workingFilename + ': ' + msg;
-  
   response({action: 'status', value: msg });
 }
