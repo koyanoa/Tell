@@ -95,6 +95,7 @@ bs.on('connection', function(client) {
       else {
         // forwarding failed. clients not matched yet, or one went offline.
         if (log) console.log(' --> Forwarding failed');
+        client.send(noFile, { action: 'error', value: 'send' });
       }
     }
     
