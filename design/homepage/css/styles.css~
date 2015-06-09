@@ -99,6 +99,13 @@ a.list-group-item.active,[class*='-info'] {
 .margin-top-250 { margin-top: 25.0em; }
 .margin-top-1000 { margin-top: 100.0em; }
 
+.margin-bottom-05 { margin-bottom: 0.5em; }
+.margin-bottom-10 { margin-bottom: 1.0em; }
+.margin-bottom-15 { margin-bottom: 1.5em; }
+.margin-bottom-20 { margin-bottom: 2.0em; }
+.margin-bottom-25 { margin-bottom: 2.5em; }
+.margin-bottom-30 { margin-bottom: 3.0em; }
+.margin-bottom-100 { margin-bottom: 10.0em; }
 
 
 

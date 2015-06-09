@@ -14,7 +14,8 @@ body {
   text-align: center;
 }
 
-/* Browse input field styles */
+
+/* Custom styles */
 
 .btn-file {
   position: relative;
@@ -39,6 +40,20 @@ input[readonly] {
   cursor: text !important;
 }
 
+/* Custom timo style */
+.item .container {
+  width: 500px;
+  height: 500px;
+}
+
+.file-list {
+  overflow: auto;      
+  height: 200px;
+}
+
+.pad {
+  padding: 3px;
+}
 
 /* Join page styles */
 #idInput {
@@ -50,4 +65,8 @@ input[readonly] {
 
 .back {
   margin-top:30px;
+}
+
+.dummy {
+  display: none;
 }

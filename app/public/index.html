@@ -77,11 +77,11 @@
               </div>
               
               <div class="item">
-                <div class="container">
+                <div class="container" id="main">
 
                   <h2>Send &amp; Receive now</h2>
                   
-                    <div class="input-group">
+                    <div class="input-group pad">
                         <span class="input-group-btn">
                             <span class="btn btn-primary btn-file">
                                 Browse&hellip; <input id="fileInput" type="file" multiple>
@@ -93,14 +93,14 @@
                         </span>
                     </div>
                   
-
                     
-                    <div>
-                        <p class="text-left lead">Received:
-                          <a href="#" class="btn btn-sm btn-default">Download all</a>
-                        </p>
+                    <div class="pad">
+                        <div class="row">
+                          <div class="col-xs-6 text-left"><h4>Received:</h4></div>
+                          <div class="col-xs-6 text-right"><a href="#" id="downloadAllButton" class="btn btn-sm btn-default" disabled="disabled">Download all as zip</a></div>
+                        </div>
                         <div class="file-list">
-                          <table id="receivedTable" class="table table-condensed text-left">
+                          <table id="receivedTable" class="table table-condensed table-striped text-left">
                             <tbody>
                               <tr>
                                 <td id="receiveStatus" colspan="2"></td>
@@ -109,14 +109,14 @@
                           </table>
                         </div>
                       </div>
-                    <p>
+                    <div class="pad">
                       <button type="button" class="btn btn-default" data-toggle="modal" data-target="#sentFilesModal">
                         Sent files
                       </button>
                       <button type="button" class="btn btn-default" data-toggle="modal" data-target="#keysModal">
                         Encryption keys
                       </button>
-                    </p>
+                    </div>
                    </div>
 
                 </div>
@@ -155,7 +155,7 @@
               <h4 class="modal-title" id="myModalLabel">Sent files</h4>
             </div>
             <div class="modal-body">
-              <table id="sentTable" class="table table-condensed text-left">
+              <table id="sentTable" class="table table-condensed  table-striped text-left">
                 <tbody>
                   <tr>
                   </tr>
@@ -198,6 +198,8 @@
     <!-- Include Tell  -->
     <script src="js/openpgp.min.js"></script>
     <script src="js/binary.min.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/filesaver.min.js"></script>
     <script src="js/tell.js"></script>
   </body>
 </html>

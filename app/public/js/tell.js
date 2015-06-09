@@ -12,6 +12,7 @@ var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
 
 var echoTest = false;
 
+var downloadList = [];
 
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
@@ -19,7 +20,7 @@ function addSentFile(name, size) {
 }
 
 function addReceivedFile(name, size, url) {
-  a = '<a href="'+url+'" download="'+name+'">'+name+'</a>';
+  a = '<a href="'+url+'" download="'+name+'" target="_blank">'+name+'</a>';
   html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   
   $('#receivedTable tr:last').before(html);
@@ -113,6 +114,7 @@ function initiate() {
 
           initWorker();
           break;
+        case 'status':
         case 'match':
           // Announce public key over BinaryJS connection
           /*
@@ -130,8 +132,11 @@ function initiate() {
           break;
         case 'received':
           resetInputStyle();
+          break;
         case 'error':
-          $('#wrongIdModal').modal();
+          if (meta.value == 'id') $('#wrongIdModal').modal();
+          else console.log('Some error received from server');
+          break;
       }
     });
   });
@@ -150,9 +155,12 @@ function initWorker() {
         addSentFile(msg.name, msg.size);
         break;
       case 'decrypted':
-        var data = new Blob([ msg.data ], {type : 'application/octet-stream'});
+        var data = new Blob([ msg.data ], {type : msg.type});
         var url = (window.URL || window.webkitURL).createObjectURL(data);
+
         addReceivedFile(msg.name, data.size, url);
+        downloadList.push({name: msg.name, data: msg.data });
+        $('#downloadAllButton').removeAttr('disabled');
         break;
       case 'request-seed':
         seedRandom(RANDOM_SEED_REQUEST);
@@ -244,6 +252,15 @@ $(document).ready(function() {
     }
   });
 
+  $( "#downloadAllButton" ).click(function() {
+    var zip = new JSZip();
+    for (i in downloadList) {
+      file = downloadList[i];
+      zip.file(file.name, file.data);
+    }
+    saveAs(zip.generate({type : "blob"}), 'Tell-Now-Files.zip');
+  });
+
   // Special File button handling
   $('.btn-file :file').on('fileselect', function(event, numFiles, label) {
       
@@ -264,4 +281,3 @@ $(document).ready(function() {
     input.trigger('fileselect', [numFiles, label]);
   });
 });
-

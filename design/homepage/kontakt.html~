@@ -54,7 +54,7 @@
   </div><!--/container-->
  
 <div class="col-sm-8 col-sm-offset-2 text-center">    
-    <a style="font-size:40px" class="glyphicon glyphicon-envelope white" href="#section2"></a>
+    <a style="font-size:40px" class="glyphicon glyphicon-envelope white vbottom" href="#section2"></a>
       </div>
 
 

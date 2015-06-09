@@ -141,8 +141,10 @@ bs.on('connection', function(client) {
           bs.clients[matchId].send(noFile, { action: 'match' });
         }
         // send to client that he was not matched
-        else client.send(noFile, { action: 'error', value: 'id' });
-        
+        else {
+          client.send(noFile, { action: 'error', value: 'id' });
+          if (log) console.log('blub');
+        }
         logAllArrays();
         break;
       
