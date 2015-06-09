@@ -93,28 +93,12 @@
                         </span>
                     </div>
                   
-                  <div class="containter">
-                    <div class="row">
-                      <div class="col-xs-6">
-                        <h4 class="text-left">Sent:</h4>
-                        <div class="file-list">
-                          <table id="sentTable" class="table table-condensed text-left">
-                            <tbody>
-                              <tr>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <div>
-                          <!-- Button trigger modal -->
-                          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#keysModal">
-                            Show encryption keys
-                          </button>
-                        </div>
-                      </div>
+
                     
-                      <div class="col-xs-6">
-                        <h4 class="text-left">Received:</h4>
+                    <div>
+                        <p class="text-left lead">Received:
+                          <a href="#" class="btn btn-sm btn-default">Download all</a>
+                        </p>
                         <div class="file-list">
                           <table id="receivedTable" class="table table-condensed text-left">
                             <tbody>
@@ -123,17 +107,16 @@
                             </tbody>
                           </table>
                         </div>
-                        <div>
-                          <a href="#" class="btn btn-sm btn-default">Download all</a>
-                        </div>
                       </div>
-                    </div> 
+                    <p>
+                      <button type="button" class="btn btn-default" data-toggle="modal" data-target="#sentFilesModal">
+                        Sent files
+                      </button>
+                      <button type="button" class="btn btn-default" data-toggle="modal" data-target="#keysModal">
+                        Encryption keys
+                      </button>
+                    </p>
                    </div>
-                  <p>
-                    <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
-                  </p>
-
-
 
                 </div>
               </div>
@@ -162,6 +145,26 @@
           </div>
         </div>
       </div>
+
+      <div class="modal fade" id="sentFilesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Sent files</h4>
+            </div>
+            <div class="modal-body">
+              <table id="sentTable" class="table table-condensed text-left">
+                <tbody>
+                  <tr>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
     </div>
 

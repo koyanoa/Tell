@@ -10,6 +10,9 @@ var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
     RANDOM_SEED_REQUEST = 20000; // random bytes seeded after worker request
 
 
+var echoTest = true;
+
+
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   $('#sentTable tr:last').after(html);
@@ -170,13 +173,13 @@ function generateKeyPair() {
     $("#privKey").text(privKey.primaryKey.fingerprint);
 
     // For local testing
-    /*
-    remotePubKey = pubKey;
-    initWorker();
-    $('.carousel').carousel(4);
-    $('#privKey').text(privKey.primaryKey.fingerprint);
-    $('#remotePubKey').text(remotePubKey.primaryKey.fingerprint);
-    */
+    if (echoTest) {
+      remotePubKey = pubKey;
+      initWorker();
+      $('.carousel').carousel(4);
+      $('#privKey').text(privKey.primaryKey.fingerprint);
+      $('#remotePubKey').text(remotePubKey.primaryKey.fingerprint);
+    }
   })
 }
 
