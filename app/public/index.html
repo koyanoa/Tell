@@ -1,38 +1,178 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>Stream file</title>
     <meta charset="utf-8">
-    <script type="text/javascript" src="js/binary.min.js"></script>
-		<script type="text/javascript" src="js/openpgp.js"></script>
-		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
-		<script type="text/javascript" src="js/tell.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Tell App Draft</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/tell.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
   </head>
   <body>
-	<div >
-    <input type="button" value="Start" id="startButton" />
-		Your number: <span id="id" ></span><br />
-		<input type="number" min="0" max="999999" id="idInput" />
-		<input type="button" value="connect" id="connectButton" />
-	</div>
+  <div class="site-wrapper">
 
-	<div id="keys">
-		Your key: <span id="privKey"></span><br />
-		Remote key: <span id="remotePubKey"></span>
-	</div>
+      <div class="site-wrapper-inner">
 
-	<div id="files">
-		Select file:
-		<input type="file" id="fileInput" multiple="" />
-    (Max. filesize 20 MiB)
-    <br />
-		Received file:
-		<ul></ul>
-	</div>
+          <div id="carousel" class="carousel slide" data-interval="false">
 
-	
-	<div id="log">
-    <span id="status"></span>
-  <div>
+            <div class="carousel-inner">
+
+              <div class="item active">
+                <div class="container">
+                <h1>Exchange Files.<br /> Easy. Secure.</h1>
+                <p class="lead">
+                  <a href="#" data-target="#carousel" data-slide-to="1" class="btn btn-lg btn-default">START</a>
+                </p>
+                </div>
+              </div>
+              
+              <div class="item">
+                <div class="container">
+                <h2>Now you can establich a secure channel.</h2>
+                <p class="lead"><a href="#" data-target="#carousel" data-slide-to="2" class="btn btn-lg btn-default">Join existing channel</a>
+                  <br />
+                  or
+                  <br />
+                  <a id="startButton" href="#" data-target="#carousel" data-slide-to="3" class="btn btn-lg btn-default">Create a new one</a>
+                </div>
+                </p>
+              </div>
+              
+              <div class="item">
+                <div class="container">
+                  <h2>Join existing channel</h2>
+                  <p class="lead">Enter your contact’s number</p>
+                  <div class="form-inline">
+                    <input id="idInput" type="tel" class="form-control" placeholder="_ _ _   _ _ _" size="10" maxlength="6" >
+                    <a id="connectButton" href="#" class="btn btn-default">Enter</a>
+                  </div>
+                  <p>
+                    <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="item">
+                <div class="container">
+                  <h2>Create a new channel</h2>
+                  <p class="lead">
+                  Tell <strong id="id"></strong> to your contact.<br />
+                  He has to join the existing channel.<br />
+                  Wait with this page open.
+                  </p>
+                  <p>
+                    <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="item">
+                <div class="container">
+
+                  <h2>Send & Receive now</h2>
+                  
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <span class="btn btn-primary btn-file">
+                                Browse&hellip; <input id="fileInput" type="file" multiple>
+                            </span>
+                        </span>
+                        <input type="text" class="form-control" readonly>
+                        <span class="input-group-btn">
+                          <button id="fileSendButton" class="btn btn-default" type="button">Send</button>
+                        </span>
+                    </div>
+                  
+                  <div class="containter">
+                    <div class="row">
+                      <div class="col-xs-6">
+                        <h4 class="text-left">Sent:</h4>
+                        <div class="file-list">
+                          <table id="sentTable" class="table table-condensed text-left">
+                            <tbody>
+                              <tr>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div>
+                          <!-- Button trigger modal -->
+                          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#keysModal">
+                            Show encryption keys
+                          </button>
+                        </div>
+                      </div>
+                    
+                      <div class="col-xs-6">
+                        <h4 class="text-left">Received:</h4>
+                        <div class="file-list">
+                          <table id="receivedTable" class="table table-condensed text-left">
+                            <tbody>
+                              <tr>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div>
+                          <a href="#" class="btn btn-sm btn-default">Download all</a>
+                        </div>
+                      </div>
+                    </div> 
+                   </div>
+                  <p>
+                    <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
+                  </p>
+
+
+
+                </div>
+              </div>
+              
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- Modal -->
+      <div class="modal fade" id="keysModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">PGP encryption keys</h4>
+            </div>
+            <div class="modal-body">
+              <p>
+                Your Key: <span id="privKey"></span><br />
+                Remote Key: <span id="remotePubKey"></span>
+              </p> 
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Include Tell  -->
+    <script src="js/openpgp.min.js"></script>
+    <script src="js/binary.min.js"></script>
+    <script src="js/tell.js"></script>
   </body>
 </html>

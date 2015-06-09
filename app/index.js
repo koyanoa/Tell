@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 var port = process.env.PORT || 5000;
+var log = true;
 
 // create a server with the express app as a listener
 var server = http.createServer(app)
@@ -17,22 +18,6 @@ var BinaryServer = require('binaryjs').BinaryServer;
 var bs = new BinaryServer({server: server, path:'/binary-endpoint'});
 var noFile = new Buffer(0); // for sending only metadata through binaryjs
 console.log('BinaryServer running');
-
-/*app.post('/action', function(req, res){
-	var action = req.body.action;
-	console.log('--------- New ' + action + ' requested ----------');
-	if (action == 'start'){
-		id = getID();
-		console.log('User requests ' + id);
-		res.send(id);
-	}
-	else if (action == 'join'){
-		join_id = req.body.id;
-		console.log('User wants to connect to ' + join_id);
-		res.send('Trying to connect you. The ID you send is ' + join_id);
-	}
-	else console.log('Problem recognizing action');
-});*/
 
 // Create 6 digit session IDs
 var idFree = [], // all available IDs
@@ -72,12 +57,14 @@ var clientsWaiting = [],
     joinId;
 
 function logAllArrays(){
-  console.log('------------- new log --------------');
-  console.log(' ---- Waiting clients\n' + clientsWaiting);
-  console.log(' ---- Waiting TELL ids\n' + idWaiting);
-  console.log(' ---- Matched Starter clients\n' + clientsMatchStart);
-  console.log(' ---- Matched Joiner clients\n' + clientsMatchJoin);
-  console.log(' ---- TELL ids that are used\n' + idUsed);
+  if (log){
+    console.log('------------- new log --------------');
+    console.log(' ---- Waiting clients\n' + clientsWaiting);
+    console.log(' ---- Waiting TELL ids\n' + idWaiting);
+    console.log(' ---- Matched Starter clients\n' + clientsMatchStart);
+    console.log(' ---- Matched Joiner clients\n' + clientsMatchJoin);
+    console.log(' ---- TELL ids that are used\n' + idUsed);
+  }
 }
 
 function inArray(arr, el){
@@ -86,7 +73,6 @@ function inArray(arr, el){
 
 // wait for new user connections
 bs.on('connection', function(client) {
-  console.log('client -JOIN- event; client id ' + client.id);
     
   // incoming stream from browser
   client.on('stream', function(stream, meta) {
@@ -104,11 +90,12 @@ bs.on('connection', function(client) {
         }
         var send = otherClient.createStream(meta);
         stream.pipe(send);
-        console.log(' --> Forwarding successful');
+        if (log) console.log(' --> Forwarding successful');
       }
       else {
         // forwarding failed. clients not matched yet, or one went offline.
-        console.log(' --> Forwarding failed');
+        if (log) console.log(' --> Forwarding failed');
+        client.send(noFile, { action: 'error', value: 'send' });
       }
     }
     
@@ -144,22 +131,22 @@ bs.on('connection', function(client) {
           // make TELL id available again
           freeID(joinId);
           // send to client that he was successfully matched
-          client.send(noFile, { action: 'status', value: true });
-          bs.clients[matchId].send(noFile, { action: 'match', value: true });
+          client.send(noFile, { action: 'match' });
+          bs.clients[matchId].send(noFile, { action: 'match' });
         }
         // send to client that he was not matched
-        else client.send(noFile, { action: 'match', value: false });
+        else client.send(noFile, { action: 'error', value: 'id' });
         
         logAllArrays();
         break;
       
       case 'pubKey':
-        console.log(' -> Forwarding PubKey');
+        if (log) console.log(' -> Forwarding PubKey');
         forwardStream();
         break;
       
       case 'file':
-        console.log(' -> Forwarding file');
+        if (log) console.log(' -> Forwarding file');
         forwardStream();
         break;
     }
