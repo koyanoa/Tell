@@ -22,7 +22,7 @@ function addReceivedFile(name, size, url) {
   a = '<a href="'+url+'" download="'+name+'">'+name+'</a>';
   html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   
-  $('#receivedTable tr:last').after(html);
+  $('#receivedTable tr:last').before(html);
 }
 
 function status(msg) {
@@ -30,6 +30,11 @@ function status(msg) {
 
   if (msg == 'finished') msg = '';
   $('#status').text(msg)
+}
+
+function receiveStatus(msg) {
+  console.log(msg);
+  $('#receiveStatus').text(msg)
 }
 
 // Array buffer <-> Binary string conversion for OpenPGP.js
@@ -63,7 +68,7 @@ function initiate() {
 
   bc.on('stream', function(stream, meta){
     if (meta.action == 'file') {
-      status("Receive...");
+      receiveStatus("Receive...");
     }
     // collect stream data
     var parts = [];
@@ -133,7 +138,14 @@ function initWorker() {
         seedRandom(RANDOM_SEED_REQUEST);
         break;
       case 'status':
-        status(msg.value);
+        receiveText = {
+          'decrypt': 'Decrypting...',
+          'verify': 'Verifying...',
+          'decrypted': '',
+        };
+
+        if (msg.value in receiveText)
+          receiveStatus(receiveText[msg.value]);
         break;
     }
   }
