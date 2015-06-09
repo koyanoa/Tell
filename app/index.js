@@ -18,22 +18,6 @@ var bs = new BinaryServer({server: server, path:'/binary-endpoint'});
 var noFile = new Buffer(0); // for sending only metadata through binaryjs
 console.log('BinaryServer running');
 
-/*app.post('/action', function(req, res){
-	var action = req.body.action;
-	console.log('--------- New ' + action + ' requested ----------');
-	if (action == 'start'){
-		id = getID();
-		console.log('User requests ' + id);
-		res.send(id);
-	}
-	else if (action == 'join'){
-		join_id = req.body.id;
-		console.log('User wants to connect to ' + join_id);
-		res.send('Trying to connect you. The ID you send is ' + join_id);
-	}
-	else console.log('Problem recognizing action');
-});*/
-
 // Create 6 digit session IDs
 var idFree = [], // all available IDs
   idUsed = []; // all currently used IDs (not available)
@@ -144,11 +128,11 @@ bs.on('connection', function(client) {
           // make TELL id available again
           freeID(joinId);
           // send to client that he was successfully matched
-          client.send(noFile, { action: 'status', value: true });
-          bs.clients[matchId].send(noFile, { action: 'match', value: true });
+          client.send(noFile, { action: 'match' );
+          bs.clients[matchId].send(noFile, { action: 'match' });
         }
         // send to client that he was not matched
-        else client.send(noFile, { action: 'match', value: false });
+        else client.send(noFile, { action: 'error', value: 'id' });
         
         logAllArrays();
         break;
