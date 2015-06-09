@@ -59,13 +59,13 @@ self.onmessage = function (event, data) {
           msg.packets[0].setFilename(name);
           workingFilename = name;
           
-          status("Sign...");
+          status('sign');
           msg = msg.sign([privKey]);
           
-          status("Encrypt...");
+          status('encrypt');
           msg = msg.encrypt([remotePubKey]);
 
-          status("Send...");
+          status('send');
           var data = str2ab(msg.packets.write());
           response({ action: 'encrypted', name: name, size: file.size, data: data }, [data]);
 
@@ -126,8 +126,5 @@ function response(event, data) {
 
 
 function status(msg) {
-  if (workingFilename)
-    msg = workingFilename + ': ' + msg;
-  
-  response({action: 'status', value: msg });
+  response({action: 'status', value: msg, filename: workingFilename });
 }

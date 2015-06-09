@@ -51,12 +51,12 @@
               <div class="item">
                 <div class="container">
                   <h2>Join existing channel</h2>
-                  <p class="lead">Enter your contact’s number</p>
+                  <p class="lead">Enter the number of the person you want to exchange files with.</p>
                   <div class="form-inline">
-                    <input id="idInput" type="tel" class="form-control" placeholder="_ _ _   _ _ _" size="10" maxlength="6" >
+                    <input id="idInput" type="tel" class="form-control" placeholder="" maxlength="6" >
                     <a id="connectButton" href="#" class="btn btn-default">Enter</a>
                   </div>
-                  <p>
+                  <p class="back">
                     <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
                   </p>
                 </div>
@@ -66,11 +66,11 @@
                 <div class="container">
                   <h2>Create a new channel</h2>
                   <p class="lead">
-                  Tell <strong id="id"></strong> to your contact.<br />
+                  Tell <strong id="id"></strong> to the person you want to exchange files with.
                   He has to join the existing channel.<br />
                   Wait with this page open.
                   </p>
-                  <p>
+                  <p class="back" >
                     <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
                   </p>
                 </div>
@@ -87,7 +87,7 @@
                                 Browse&hellip; <input id="fileInput" type="file" multiple>
                             </span>
                         </span>
-                        <input type="text" class="form-control" placeholder="Max. 20 MB per file" readonly>
+                        <input type="text" id="fileInputText" class="form-control" placeholder="Multiple files possible. Max. 20 MB each." readonly>
                         <span class="input-group-btn">
                           <button id="fileSendButton" class="btn btn-default" type="button">Send</button>
                         </span>
@@ -161,6 +161,27 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal fade" id="wrongIdModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Sorry, wrong number.</h4>
+            </div>
+            <div class="modal-body text-left">
+              <p>
+              It seems you entered a wrong number.
+              <ul>
+                <li>The number is necessary to establish a secure channel between you and the other person.</li>
+                <li>As you're on this page, the other person has to give you this number to enter, for example by phone.</li>
+                <li>It has six digits between 0 and 9.</li>
+              </ul>
+              </p> 
             </div>
           </div>
         </div>
