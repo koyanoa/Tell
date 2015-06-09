@@ -94,18 +94,18 @@ self.onmessage = function (event, data) {
 
         var msg = new window.openpgp.message.Message(packetlist);
 
-        status("Decrypt...");
+        status('decrypt');
         msg = msg.decrypt(privKey);
 
         var name = msg.packets[1].getFilename();
         workingFilename = name;
 
-        status("Verify...");
+        status('verify');
         var verified = msg.verify([remotePubKey])[0].valid
         console.log("verified: " + verified);
         
         workingFilename = '';
-        status('finished');
+        status('decrypted');
 
         // Display verified file in browser
         if (verified == true) {
