@@ -4,7 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 var port = process.env.PORT || 5000;
-var log = true;
+var log = false;
 
 // create a server with the express app as a listener
 var server = http.createServer(app)
@@ -115,7 +115,7 @@ bs.on('connection', function(client) {
         if (inArray(idWaiting,joinId)) {
           var idx = idWaiting.indexOf(joinId);
           var matchId = clientsWaiting[idx];
-//-> to finish          // catch if client enters his own TELL id
+          // catch if client enters his own TELL id
           if (matchId == client.id) {
             if (log) console.log('Client tried to connect to itself');
             client.send(noFile, { action: 'error', value: 'id' });
@@ -141,8 +141,10 @@ bs.on('connection', function(client) {
           bs.clients[matchId].send(noFile, { action: 'match' });
         }
         // send to client that he was not matched
-        else client.send(noFile, { action: 'error', value: 'id' });
-        
+        else {
+          client.send(noFile, { action: 'error', value: 'id' });
+          if (log) console.log('blub');
+        }
         logAllArrays();
         break;
       
@@ -153,6 +155,9 @@ bs.on('connection', function(client) {
       
       case 'file':
         if (log) console.log(' -> Forwarding file');
+        stream.on('end', function(){
+          client.send(noFile, { action: 'received' });
+        });
         forwardStream();
         break;
     }

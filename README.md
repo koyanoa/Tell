@@ -27,6 +27,7 @@ http://openpgpjs.org/openpgpjs/doc/
 | match       | -          | -    |
 | error       | 'id'/'overload'/'send'| -    |
 | close       | -          | -    |
+| received    | -          | -    |
 
 * Client to Server
 

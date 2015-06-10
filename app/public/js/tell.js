@@ -4,14 +4,15 @@ var privKey, pubKey, remotePubKey;
 
 var noFile = new ArrayBuffer(0);
 
-var w;
+var w, bc;
 
 var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
     RANDOM_SEED_REQUEST = 20000; // random bytes seeded after worker request
 
 
-var echoTest = true;
+var echoTest = false;
 
+var downloadList = [];
 
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
@@ -19,7 +20,7 @@ function addSentFile(name, size) {
 }
 
 function addReceivedFile(name, size, url) {
-  a = '<a href="'+url+'" download="'+name+'">'+name+'</a>';
+  a = '<a href="'+url+'" download="'+name+'" target="_blank">'+name+'</a>';
   html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   
   $('#receivedTable tr:last').before(html);
@@ -34,7 +35,25 @@ function status(msg) {
 
 function receiveStatus(msg) {
   console.log(msg);
-  $('#receiveStatus').text(msg)
+  $('#receiveStatus').text(msg);
+}
+
+function sendStatus(msg) {
+  console.log(msg);
+  $('#fileInputText').val(msg);
+}
+
+function inputSendStyle(){
+  $('#fileSendButton').prop('disabled', true);
+  $('#fileInput').prop('disabled', true);
+  $('#fileInputText').prop('disabled', true);
+}
+
+function resetInputStyle() {
+  $('#fileInputText').val('');
+  $('#fileSendButton').prop('disabled', false);
+  $('#fileInput').prop('disabled', false);
+  $('#fileInputText').prop('disabled', false);
 }
 
 // Array buffer <-> Binary string conversion for OpenPGP.js
@@ -95,22 +114,28 @@ function initiate() {
 
           initWorker();
           break;
+        case 'status':
         case 'match':
           // Announce public key over BinaryJS connection
           /*
              Keys are small and sent in one chunk, thus we can send as
              ArrayBuffer instead of a Blob
           */
-          if (meta.value == true) {
-            var data = str2ab(pubKey.toPacketlist().write());
-            bc.send(data, { action: 'pubKey' });
-          }
+          var data = str2ab(pubKey.toPacketlist().write());
+          bc.send(data, { action: 'pubKey' });
           break;
         case 'file':
           w.postMessage({
             action: 'decrypt',
             data: parts
           }, parts);
+          break;
+        case 'received':
+          resetInputStyle();
+          break;
+        case 'error':
+          if (meta.value == 'id') $('#wrongIdModal').modal();
+          else console.log('Some error received from server');
           break;
       }
     });
@@ -125,13 +150,17 @@ function initWorker() {
 
     switch (msg.action) {
       case 'encrypted':
-        var stream = bc.send(msg.data, { action: 'file' });
+        bc.send(msg.data, { action: 'file' });
+        if (echoTest) bc.send(noFile, { action: 'received' });
         addSentFile(msg.name, msg.size);
         break;
       case 'decrypted':
-        var data = new Blob([ msg.data ], {type : 'application/octet-stream'});
+        var data = new Blob([ msg.data ], {type : msg.type});
         var url = (window.URL || window.webkitURL).createObjectURL(data);
+
         addReceivedFile(msg.name, data.size, url);
+        downloadList.push({name: msg.name, data: msg.data });
+        $('#downloadAllButton').removeAttr('disabled');
         break;
       case 'request-seed':
         seedRandom(RANDOM_SEED_REQUEST);
@@ -142,7 +171,13 @@ function initWorker() {
           'verify': 'Verifying...',
           'decrypted': '',
         };
-
+        sendText = {
+          'encrypt': 'Encrypting ' + msg.filename + '...',
+          'sign': 'Signing ' + msg.filename + '...',
+          'send': 'Sending ' + msg.filename + '...'
+        };
+        if (msg.value in sendText)
+          sendStatus(sendText[msg.value]);
         if (msg.value in receiveText)
           receiveStatus(receiveText[msg.value]);
         break;
@@ -194,7 +229,6 @@ function generateKeyPair() {
   })
 }
 
-
 $(document).ready(function() {
   initiate();
 
@@ -209,11 +243,22 @@ $(document).ready(function() {
   });
 
   $('#fileSendButton').click(function() {
-    $('#fileSendButton').attr('disabled', true);
-    w.postMessage({
-      action: 'encrypt',
-      files: $('#fileInput').prop('files'),
-    });
+    if ($('#fileInputText').val() != '') {
+      inputSendStyle();
+      w.postMessage({
+        action: 'encrypt',
+        files: $('#fileInput').prop('files'),
+      });
+    }
+  });
+
+  $( "#downloadAllButton" ).click(function() {
+    var zip = new JSZip();
+    for (i in downloadList) {
+      file = downloadList[i];
+      zip.file(file.name, file.data);
+    }
+    saveAs(zip.generate({type : "blob"}), 'Tell-Now-Files.zip');
   });
 
   // Special File button handling
@@ -236,4 +281,3 @@ $(document).ready(function() {
     input.trigger('fileselect', [numFiles, label]);
   });
 });
-
