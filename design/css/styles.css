@@ -137,7 +137,8 @@ footer .nav>li>a:hover {
 .arrow-container{
   position:absolute;
   bottom:50px;
-  width:97%;
+  margin-left:-15px;
+  width:100%;
   text-align:center;
 }
 
@@ -156,6 +157,12 @@ footer .nav>li>a:hover {
 #contactLink {
   font-size:2em;
   color:#ddd;
+}
+
+.slider {
+   margin:-20px 0 0 0;
+   padding:0px;
+   height:0px;
 }
 
 .glyphicon.glyphicon_about {
