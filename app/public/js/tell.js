@@ -1,4 +1,4 @@
-var bcUrl = 'ws://localhost:5000/binary-endpoint';
+var bcUrl = 'wss://localhost:5000/binary-endpoint';
 
 var privKey, pubKey, remotePubKey;
 
