@@ -105,6 +105,14 @@ a.list-group-item.active,[class*='-info'] {
 .margin-top-1000 { margin-top: 100.0em; }
 
 
+
+.mail{
+    text-decoration:none !important;
+    color:#dedeff;
+    font-size:160%;
+    
+}
+
 footer {
 	background-color:#494949;
     color:#ddd;
