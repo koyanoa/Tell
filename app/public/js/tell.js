@@ -69,7 +69,7 @@ function str2ab(str) {
 }
 
 function bytesToSize(bytes) {
-    var sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB'];
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes == 0) return 'n/a';
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
     if (i == 0) return bytes + ' ' + sizes[i]; 
@@ -159,7 +159,7 @@ function initWorker() {
 
         addReceivedFile(msg.name, data.size, url);
         downloadList.push({name: msg.name, data: msg.data });
-        $('#downloadAllButton').removeAttr('disabled');
+        $('#files').css('visibility', 'visible');
         break;
       case 'request-seed':
         seedRandom(RANDOM_SEED_REQUEST);
@@ -223,6 +223,7 @@ function generateKeyPair() {
     if (echoTest) {
       remotePubKey = pubKey;
       initWorker();
+      initiate();
       $('.carousel').carousel(4);
       $('#privKey').text(privKey.primaryKey.fingerprint);
       $('#remotePubKey').text(remotePubKey.primaryKey.fingerprint);

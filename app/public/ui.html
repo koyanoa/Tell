@@ -10,7 +10,7 @@
                 <div class="container">
                 <h1>Exchange Files.<br /> Easy. Secure.</h1>
                 <p class="lead">
-                  <a href="#" id="startButton" class="btn btn-lg btn-primary">START</a>
+                  <a href="#" id="startButton" class="btn btn-lg btn-default">START</a>
                 </p>
                 </div>
               </div>
@@ -18,11 +18,11 @@
               <div class="item">
                 <div class="container">
                 <h2>Now you can establich a secure channel.</h2>
-                <p class="lead"><a href="#" data-target="#carousel" data-slide-to="2" class="btn btn-lg btn-primary">Join existing channel</a>
+                <p class="lead"><a href="#" data-target="#carousel" data-slide-to="2" class="btn btn-lg btn-default">Join existing channel</a>
                   <br />
                   or
                   <br />
-                  <a id="createButton" href="#" data-target="#carousel" data-slide-to="3" class="btn btn-lg btn-primary">Create a new one</a>
+                  <a id="createButton" href="#" data-target="#carousel" data-slide-to="3" class="btn btn-lg btn-default">Create a new one</a>
                 </div>
                 </p>
               </div>
@@ -33,7 +33,7 @@
                   <p class="lead">Enter the number of the person you want to exchange files with.</p>
                   <div class="form-inline">
                     <input id="idInput" type="tel" class="form-control" placeholder="" maxlength="6" >
-                    <a id="connectButton" href="#" class="btn btn-primary">Enter</a>
+                    <a id="connectButton" href="#" class="btn btn-default">Enter</a>
                   </div>
                   <p class="back">
                     <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
@@ -62,7 +62,7 @@
                   
                     <div class="input-group pad">
                         <span class="input-group-btn">
-                            <span class="btn btn-primary btn-file">
+                            <span class="btn btn-default btn-file">
                                 Browse&hellip; <input id="fileInput" type="file" multiple>
                             </span>
                         </span>
@@ -73,13 +73,13 @@
                     </div>
                   
                     
-                    <div class="pad">
+                    <div class="pad" style="visibility: hidden" id="files">
                         <div class="row">
                           <div class="col-xs-6 text-left"><h4>Received:</h4></div>
-                          <div class="col-xs-6 text-right"><a href="#" id="downloadAllButton" class="btn btn-sm btn-default" disabled="disabled">Download all as zip</a></div>
+                          <div class="col-xs-6 text-right"><a href="#" id="downloadAllButton" class="btn btn-sm btn-default">Download all as zip</a></div>
                         </div>
                         <div class="file-list">
-                          <table id="receivedTable" class="table table-condensed table-striped text-left">
+                          <table id="receivedTable" class="table table-condensed text-left">
                             <tbody>
                               <tr>
                                 <td id="receiveStatus" colspan="2"></td>
@@ -174,7 +174,7 @@
             </div>
             <div class="modal-body text-center">
               <p>The other person has left the channel. To send files again, create a new session.</p>
-              <p><a class="btn btn-primary" href="/">Start again</a></p> 
+              <p><a class="btn btn-default" href="/">Start again</a></p> 
             </div>
           </div>
         </div>

@@ -38,6 +38,7 @@ body {
 input[readonly] {
   background-color: white !important;
   cursor: text !important;
+  border: 0px;
 }
 
 /* Custom timo style */
@@ -61,6 +62,7 @@ input[readonly] {
   width: 130px;
   text-align:center;
   letter-spacing:+4px;
+  color: #168ccc;
 }
 
 .back {
@@ -68,5 +70,34 @@ input[readonly] {
 }
 
 .dummy {
-  display: none;
+  visibility: hidden;
+}
+
+
+/* Tell Website Template adjustments */
+
+.btn-default {
+  background-color: #279ddd;
+  color:#dedeff;
+  border: 1px solid #279ddd;
+}
+.btn-default:hover, .btn-default:focus {
+  background-color: #dedeff;
+  color:#168ccc;
+  border: 1px solid #dedeff;
+}
+
+#id {
+  color: white;
+}
+
+#receivedTable a {
+  color: white;
+}
+#receivedTable a:hover {
+  color: #dedeff;
+}
+
+.modal {
+  color: #168ccc;
 }
