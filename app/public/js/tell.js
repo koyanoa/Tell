@@ -14,6 +14,11 @@ var echoTest = false;
 
 var downloadList = [];
 
+$.getScript("js/binary.min.js" );  
+$.getScript("js/jszip.min.js" );  
+$.getScript("js/filesaver.min.js" );  
+
+
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   $('#sentTable tr:last').after(html);
@@ -229,10 +234,13 @@ function generateKeyPair() {
   })
 }
 
-$(document).ready(function() {
-  initiate();
-
+$("#tellApp").load("ui.html", function() {
   $('#startButton').click(function() {
+    initiate();
+    $('.carousel').carousel(1);
+  });
+
+  $('#createButton').click(function() {
     bc.send(noFile, { action: 'start' });
   });
 
