@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Tell App Draft</title>
+    <title>Tell Now.</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -19,176 +19,7 @@
     <![endif]-->
   </head>
   <body>
-  <div class="site-wrapper">
-
-      <div class="site-wrapper-inner">
-
-          <div id="carousel" class="carousel slide" data-interval="false">
-
-            <div class="carousel-inner">
-
-              <div class="item active">
-                <div class="container">
-                <h1>Exchange Files.<br /> Easy. Secure.</h1>
-                <p class="lead">
-                  <a href="#" data-target="#carousel" data-slide-to="1" class="btn btn-lg btn-default">START</a>
-                </p>
-                </div>
-              </div>
-              
-              <div class="item">
-                <div class="container">
-                <h2>Now you can establich a secure channel.</h2>
-                <p class="lead"><a href="#" data-target="#carousel" data-slide-to="2" class="btn btn-lg btn-default">Join existing channel</a>
-                  <br />
-                  or
-                  <br />
-                  <a id="startButton" href="#" data-target="#carousel" data-slide-to="3" class="btn btn-lg btn-default">Create a new one</a>
-                </div>
-                </p>
-              </div>
-              
-              <div class="item">
-                <div class="container">
-                  <h2>Join existing channel</h2>
-                  <p class="lead">Enter the number of the person you want to exchange files with.</p>
-                  <div class="form-inline">
-                    <input id="idInput" type="tel" class="form-control" placeholder="" maxlength="6" >
-                    <a id="connectButton" href="#" class="btn btn-default">Enter</a>
-                  </div>
-                  <p class="back">
-                    <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
-                  </p>
-                </div>
-              </div>
-              
-              <div class="item">
-                <div class="container">
-                  <h2>Create a new channel</h2>
-                  <p class="lead">
-                  Tell <strong id="id"></strong> to the person you want to exchange files with.
-                  He has to join the existing channel.<br />
-                  Wait with this page open.
-                  </p>
-                  <p class="back" >
-                    <button type="submit" data-target="#carousel" data-slide-to="1" class="btn btn-xs btn-default">Back</button>
-                  </p>
-                </div>
-              </div>
-              
-              <div class="item">
-                <div class="container" id="main">
-
-                  <h2>Send &amp; Receive now</h2>
-                  
-                    <div class="input-group pad">
-                        <span class="input-group-btn">
-                            <span class="btn btn-primary btn-file">
-                                Browse&hellip; <input id="fileInput" type="file" multiple>
-                            </span>
-                        </span>
-                        <input type="text" id="fileInputText" class="form-control" placeholder="Multiple files possible. Max. 20 MB each." readonly>
-                        <span class="input-group-btn">
-                          <button id="fileSendButton" class="btn btn-default" type="button">Send</button>
-                        </span>
-                    </div>
-                  
-                    
-                    <div class="pad">
-                        <div class="row">
-                          <div class="col-xs-6 text-left"><h4>Received:</h4></div>
-                          <div class="col-xs-6 text-right"><a href="#" id="downloadAllButton" class="btn btn-sm btn-default" disabled="disabled">Download all as zip</a></div>
-                        </div>
-                        <div class="file-list">
-                          <table id="receivedTable" class="table table-condensed table-striped text-left">
-                            <tbody>
-                              <tr>
-                                <td id="receiveStatus" colspan="2"></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    <div class="pad">
-                      <button type="button" class="btn btn-default" data-toggle="modal" data-target="#sentFilesModal">
-                        Sent files
-                      </button>
-                      <button type="button" class="btn btn-default" data-toggle="modal" data-target="#keysModal">
-                        Encryption keys
-                      </button>
-                    </div>
-                   </div>
-
-                </div>
-              </div>
-              
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-      <!-- Modal -->
-      <div class="modal fade" id="keysModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">PGP encryption keys</h4>
-            </div>
-            <div class="modal-body">
-              <p>
-                Your Key: <span id="privKey"></span><br />
-                Remote Key: <span id="remotePubKey"></span>
-              </p> 
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal fade" id="sentFilesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Sent files</h4>
-            </div>
-            <div class="modal-body">
-              <table id="sentTable" class="table table-condensed  table-striped text-left">
-                <tbody>
-                  <tr>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="modal fade" id="wrongIdModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Sorry, wrong number.</h4>
-            </div>
-            <div class="modal-body text-left">
-              <p>
-              It seems you entered a wrong number.
-              <ul>
-                <li>The number is necessary to establish a secure channel between you and the other person.</li>
-                <li>As you're on this page, the other person has to give you this number to enter, for example by phone.</li>
-                <li>It has six digits between 0 and 9.</li>
-              </ul>
-              </p> 
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-    </div>
+    <div id="tellApp"></div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -197,9 +28,6 @@
 
     <!-- Include Tell  -->
     <script src="js/openpgp.min.js"></script>
-    <script src="js/binary.min.js"></script>
-    <script src="js/jszip.min.js"></script>
-    <script src="js/filesaver.min.js"></script>
     <script src="js/tell.js"></script>
   </body>
 </html>
