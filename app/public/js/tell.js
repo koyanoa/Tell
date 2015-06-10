@@ -31,13 +31,6 @@ function addReceivedFile(name, size, url) {
   $('#receivedTable tr:last').before(html);
 }
 
-function status(msg) {
-  console.log(msg);
-
-  if (msg == 'finished') msg = '';
-  $('#status').text(msg)
-}
-
 function receiveStatus(msg) {
   console.log(msg);
   $('#receiveStatus').text(msg);
@@ -191,7 +184,7 @@ function initWorker() {
 
   function seedRandom(size) {
     var buf = new Uint8Array(size);
-    window.openpgp.crypto.random.getRandomValues(buf);
+    openpgp.crypto.random.getRandomValues(buf);
     w.postMessage({action: 'seed-random', buf: buf});
   };
 
@@ -206,7 +199,9 @@ function initWorker() {
    
 
 function generateKeyPair() {
-  status('Generating keypair...');
+  console.log('Generating keypair...');
+
+  openpgp.initWorker('js/openpgp.worker.js');
 
   var options = {
     numBits: 2048,
@@ -215,13 +210,12 @@ function generateKeyPair() {
   };
 
   openpgp.generateKeyPair(options).then(function(keypair) {
-    status('finished');
-
     privKey = keypair.key;
     pubKey = privKey.toPublic();
 
     // Display fingerprint
     $("#privKey").text(privKey.primaryKey.fingerprint);
+    console.log('Generated keypair');
 
     // For local testing
     if (echoTest) {
