@@ -133,6 +133,9 @@ function initiate() {
           if (meta.value == 'id') $('#wrongIdModal').modal();
           else console.log('Some error received from server');
           break;
+        case 'close':
+          $('#connectionClosed').modal();
+          break;
       }
     });
   });
