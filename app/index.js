@@ -7,7 +7,7 @@ var certificate = fs.readFileSync('tls/ssl.crt', 'utf8');
 
 var credentials = {key: privateKey, cert: certificate};
 var app = express();
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 62938;
 var log = false;
 
 
