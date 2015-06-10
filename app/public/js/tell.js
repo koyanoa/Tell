@@ -1,4 +1,4 @@
-var bcUrl = 'wss://localhost:5000/binary-endpoint';
+var bcUrl = 'wss://' + window.location.hostname + ':5000';
 
 var privKey, pubKey, remotePubKey;
 
@@ -14,10 +14,11 @@ var echoTest = false;
 
 var downloadList = [];
 
+
+$.getScript("js/openpgp.min.js" );  
 $.getScript("js/binary.min.js" );  
 $.getScript("js/jszip.min.js" );  
 $.getScript("js/filesaver.min.js" );  
-
 
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
@@ -78,8 +79,6 @@ function bytesToSize(bytes) {
 
 
 function initiate() {
-  generateKeyPair();
-
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
 
@@ -201,6 +200,7 @@ function initWorker() {
 function generateKeyPair() {
   console.log('Generating keypair...');
 
+  openpgp.config.useWebCrypto = false;
   openpgp.initWorker('js/openpgp.worker.js');
 
   var options = {
@@ -229,6 +229,8 @@ function generateKeyPair() {
 }
 
 $("#tellApp").load("ui.html", function() {
+  generateKeyPair();
+
   $('#startButton').click(function() {
     initiate();
     $('.carousel').carousel(1);

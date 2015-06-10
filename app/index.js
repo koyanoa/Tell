@@ -22,7 +22,7 @@ app.use(express.static(__dirname + '/public'));
 
 // attach BinaryServer to the base http server
 var BinaryServer = require('binaryjs').BinaryServer;
-var bs = new BinaryServer({server: server, path:'/binary-endpoint'});
+var bs = new BinaryServer({server: server});
 var noFile = new Buffer(0); // for sending only metadata through binaryjs
 console.log('BinaryServer running');
 
