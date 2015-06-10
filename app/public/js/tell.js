@@ -1,4 +1,4 @@
-var bcUrl = 'ws://localhost:5000/binary-endpoint';
+var bcUrl = 'wss://' + window.location.hostname + ':5000';
 
 var privKey, pubKey, remotePubKey;
 
@@ -14,6 +14,12 @@ var echoTest = false;
 
 var downloadList = [];
 
+
+$.getScript("js/openpgp.min.js" );  
+$.getScript("js/binary.min.js" );  
+$.getScript("js/jszip.min.js" );  
+$.getScript("js/filesaver.min.js" );  
+
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   $('#sentTable tr:last').after(html);
@@ -24,13 +30,6 @@ function addReceivedFile(name, size, url) {
   html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   
   $('#receivedTable tr:last').before(html);
-}
-
-function status(msg) {
-  console.log(msg);
-
-  if (msg == 'finished') msg = '';
-  $('#status').text(msg)
 }
 
 function receiveStatus(msg) {
@@ -80,8 +79,6 @@ function bytesToSize(bytes) {
 
 
 function initiate() {
-  generateKeyPair();
-
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
 
@@ -186,7 +183,7 @@ function initWorker() {
 
   function seedRandom(size) {
     var buf = new Uint8Array(size);
-    window.openpgp.crypto.random.getRandomValues(buf);
+    openpgp.crypto.random.getRandomValues(buf);
     w.postMessage({action: 'seed-random', buf: buf});
   };
 
@@ -201,7 +198,10 @@ function initWorker() {
    
 
 function generateKeyPair() {
-  status('Generating keypair...');
+  console.log('Generating keypair...');
+
+  openpgp.config.useWebCrypto = false;
+  openpgp.initWorker('js/openpgp.worker.js');
 
   var options = {
     numBits: 2048,
@@ -210,13 +210,12 @@ function generateKeyPair() {
   };
 
   openpgp.generateKeyPair(options).then(function(keypair) {
-    status('finished');
-
     privKey = keypair.key;
     pubKey = privKey.toPublic();
 
     // Display fingerprint
     $("#privKey").text(privKey.primaryKey.fingerprint);
+    console.log('Generated keypair');
 
     // For local testing
     if (echoTest) {
@@ -229,10 +228,15 @@ function generateKeyPair() {
   })
 }
 
-$(document).ready(function() {
-  initiate();
+$("#tellApp").load("ui.html", function() {
+  generateKeyPair();
 
   $('#startButton').click(function() {
+    initiate();
+    $('.carousel').carousel(1);
+  });
+
+  $('#createButton').click(function() {
     bc.send(noFile, { action: 'start' });
   });
 
