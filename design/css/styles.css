@@ -87,6 +87,7 @@ a.list-group-item.active,[class*='-info'] {
 	background-color: #168ccc;
     color:#ddd;
 }
+
 .margin-top-05 { margin-top: 0.5em; }
 .margin-top-10 { margin-top: 1.0em; }
 .margin-top-15 { margin-top: 1.5em; }
@@ -100,11 +101,6 @@ a.list-group-item.active,[class*='-info'] {
 .margin-top-1000 { margin-top: 100.0em; }
 
 
-
-
-.white, .white a {
-  color: #fff;
-}
 
 footer {
 	background-color:#494949;
@@ -123,3 +119,17 @@ footer .nav>li>a:hover {
     background-color:transparent;
 	color:#fff;
 }
+
+.arrow {
+    font-size:40px;
+    text-decoration:none !important;
+}
+
+.blueish {
+    color:#dedeff;
+}
+
+.glyphicon.glyphicon_about {
+    font-size: 60px;
+}
+
