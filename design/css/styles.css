@@ -62,21 +62,25 @@ a.list-group-item.active,[class*='-info'] {
 #section1 {
 	background-color: #168ccc;
     color:#dedeff;
+    position:relative;
 }
   
 #section2 {
 	background-color: #e5e5ef;
     color:#686868;
+    position:relative;
 }
   
 #section3 {
 	background-color: #168ccc;
     color:#ddd;
+    position:relative;
 }
 
 #section4 {
 	background-color: #fff;
     color:#444;
+      position:relative;
 }
 
 #section5,#section7,#section7 a {
@@ -101,7 +105,6 @@ a.list-group-item.active,[class*='-info'] {
 .margin-top-1000 { margin-top: 100.0em; }
 
 
-
 footer {
 	background-color:#494949;
     color:#ddd;
@@ -120,16 +123,33 @@ footer .nav>li>a:hover {
 	color:#fff;
 }
 
-.arrow {
-    font-size:40px;
-    text-decoration:none !important;
+
+/* Custom styles */
+
+.arrow-container{
+  position:absolute;
+  bottom:50px;
+  width:97%;
+  text-align:center;
 }
 
-.blueish {
-    color:#dedeff;
+.arrow-light{
+  font-size:40px;
+  text-decoration:none !important;
+  color:#dedeff;
+}
+
+.arrow-dark{
+  font-size:40px;
+  text-decoration:none !important;
+  color:#168ccc;
+}
+
+#contactLink {
+  font-size:2em;
+  color:#ddd;
 }
 
 .glyphicon.glyphicon_about {
     font-size: 60px;
 }
-
