@@ -1,4 +1,4 @@
-var bcUrl = 'wss://' + window.location.hostname + ':5000';
+var bcUrl = 'wss://' + window.location.hostname + ':62938';
 
 var privKey, pubKey, remotePubKey;
 
@@ -15,7 +15,6 @@ var echoTest = false;
 var downloadList = [];
 
 
-$.getScript("js/openpgp.min.js" );  
 $.getScript("js/binary.min.js" );  
 $.getScript("js/jszip.min.js" );  
 $.getScript("js/filesaver.min.js" );  
