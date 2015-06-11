@@ -6,6 +6,9 @@ var noFile = new ArrayBuffer(0);
 
 var w, bc;
 
+var keysGenerated = false;
+var matched = false;
+
 var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
     RANDOM_SEED_REQUEST = 20000; // random bytes seeded after worker request
 
@@ -102,12 +105,16 @@ function formatKey(key) {
 }
 
 function initiate() {
+  
+  generateKeyPair();
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
 
   bc.on('stream', function(stream, meta){
     if (meta.action == 'file') {
       receiveStatus("Receive...");
+      $('#hideReceive').show();
+      $('#hideSendRequest').hide();
     }
     // collect stream data
     var parts = [];
@@ -125,24 +132,16 @@ function initiate() {
           var packetlist = new openpgp.packet.List();
           packetlist.read(ab2str(parts[0]));
           remotePubKey = new openpgp.key.Key(packetlist);
-
-          $('.carousel').carousel(4);
           
           // update key display
-          $('#privKey').text(formatKey(privKey));
           $('#remotePubKey').text(formatKey(remotePubKey));
-
-          initWorker();
+          tryInitWorker();
           break;
-        case 'status':
         case 'match':
-          // Announce public key over BinaryJS connection
-          /*
-             Keys are small and sent in one chunk, thus we can send as
-             ArrayBuffer instead of a Blob
-          */
-          var data = str2ab(pubKey.toPacketlist().write());
-          bc.send(data, { action: 'pubKey' });
+          $('.carousel').carousel(4);
+          $('#keyGen').modal( {'backdrop':'static'} );
+          matched = true;
+          sendPubKey();
           break;
         case 'file':
           w.postMessage({
@@ -165,7 +164,16 @@ function initiate() {
   });
 }
 
+function tryInitWorker() {
+  if (privKey && remotePubKey) {
+    initWorker();
+    $('#keyGen').modal('hide');
+    $('#hideSendRequest').show();
+  }
+}
+
 function initWorker() {
+  
   w = new Worker('js/tell.worker.js');
 
   w.onmessage = function (event, data) {
@@ -187,7 +195,6 @@ function initWorker() {
 
         addReceivedFile(msg.name, data.size, url);
         downloadList.push({name: msg.name, data: msg.data });
-        $('#files').css('visibility', 'visible');
         break;
       case 'request-seed':
         seedRandom(RANDOM_SEED_REQUEST);
@@ -224,8 +231,17 @@ function initWorker() {
     remotePubKey: remotePubKey.toPacketlist(),
   });
 }
-  
-   
+
+
+function sendPubKey(){
+  // Announce public key over BinaryJS connection when matched and keys are fully generated
+  if (matched == true && keysGenerated == true) {
+    var data = str2ab(pubKey.toPacketlist().write());
+    bc.send(data, { action: 'pubKey' });
+    tryInitWorker();
+  }
+}
+
 
 function generateKeyPair() {
   console.log('Generating keypair...');
@@ -246,8 +262,10 @@ function generateKeyPair() {
     pubKey = privKey.toPublic();
 
     // Display fingerprint
-    $("#privKey").text(privKey.primaryKey.fingerprint);
+    $('#privKey').text(formatKey(privKey));
     console.log('Generated keypair');
+    keysGenerated = true;
+    sendPubKey();
 
     // For local testing
     if (echoTest) {
@@ -263,7 +281,6 @@ function generateKeyPair() {
 }
 
 $("#tellApp").load("ui.html", function() {
-  generateKeyPair();
 
   $('#startButton').click(function() {
     initiate();

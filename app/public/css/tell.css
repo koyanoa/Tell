@@ -47,9 +47,8 @@ input[readonly] {
   height: 500px;
 }
 
-.file-list {
+#fileList {
   overflow: auto;      
-  height: 200px;
 }
 
 .pad {
@@ -82,12 +81,12 @@ input[readonly] {
 
 .btn-default {
   background-color: #279ddd;
-  color:#dedeff;
+  color: #dedeff;
   border: 1px solid #279ddd;
 }
 .btn-default:hover, .btn-default:focus {
   background-color: #dedeff;
-  color:#168ccc;
+  color: #168ccc;
   border: 1px solid #dedeff;
 }
 
@@ -104,4 +103,28 @@ input[readonly] {
 
 .modal {
   color: #168ccc;
+}
+
+#keyGen {
+  color:#dedeff;
+  font-size:180%;
+  padding-top:250px;
+}
+
+#files {
+  height:250px;
+}
+
+#hideReceive {
+  display:none;
+}
+
+#hideSendRequest {
+  display:none;
+  padding-top:50px;
+  font-size:150%;
+
+}
+#hideSendRequest span {
+  font-size:300%;
 }

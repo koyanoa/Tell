@@ -60,7 +60,7 @@
               <div class="item">
                 <div class="container" id="main">
 
-                  <h2>Send &amp; Receive now</h2>
+                  <h2>Send &amp; Receive</h2>
                   
                     <div class="input-group pad">
                         <span class="input-group-btn">
@@ -74,13 +74,14 @@
                         </span>
                     </div>
                   
-                    
-                    <div class="pad" style="visibility: hidden" id="files">
+                    <div class="pad" id="files">
+                      
+                      <div id="hideReceive">
                         <div class="row">
                           <div class="col-xs-6 text-left"><h4>Received:</h4></div>
                           <div class="col-xs-6 text-right"><a href="#" id="downloadAllButton" class="btn btn-sm btn-default">Download all as zip</a></div>
                         </div>
-                        <div class="file-list">
+                        <div id="fileList">
                           <table id="receivedTable" class="table table-condensed text-left">
                             <tbody>
                               <tr>
@@ -89,7 +90,17 @@
                             </tbody>
                           </table>
                         </div>
-                      </div>
+                      </div> <!--/hideReceive-->
+                      
+                      <div id="hideSendRequest">
+                        <div class="row text-center">
+                          <p><span class="glyphicon glyphicon-transfer" area-hidden="true"></span></p>
+                          <p>To send files click "Browse..." <br />Received files will appear here</p>
+                        </div>
+                      </div> <!--/hideSendRequest-->
+                      
+                    </div> <!--/files-->
+                    
                     <div class="pad">
                       <button type="button" class="btn btn-default" data-toggle="modal" data-target="#sentFilesModal">
                         Sent files
@@ -180,6 +191,25 @@
               <p><a class="btn btn-default" href="/">Start again</a></p> 
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="error" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="errorModalTitle"></h4>
+            </div>
+            <div class="modal-body text-center" id="errorModalText">
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal " id="keyGen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          Generating keys...
         </div>
       </div>
 
