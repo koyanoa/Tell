@@ -154,10 +154,16 @@ footer .nav>li>a:hover {
   color:#168ccc;
 }
 
-#contactLink {
-  font-size:2em;
+#contactLink{
   color:#ddd;
 }
+
+#contactLink:hover{
+    color:#38afef;
+    text-decoration:none !important
+}
+
+
 
 .slider {
    margin:-20px 0 0 0;
@@ -165,7 +171,7 @@ footer .nav>li>a:hover {
    height:0px;
 }
 
-.glyphicon.glyphicon_about {
+.glyphsize {
     font-size: 60px;
 }
 
