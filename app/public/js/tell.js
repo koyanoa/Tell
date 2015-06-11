@@ -1,4 +1,4 @@
-var bcUrl = 'wss://' + window.location.hostname + ':62938';
+var bcUrl = 'ws://' + window.location.hostname + ':62938';
 
 var privKey, pubKey, remotePubKey;
 
@@ -15,16 +15,29 @@ var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
 MAX_FILE_SIZE = 20*1024*1024;
 
 
-var echoTest = false;
+var echoTest = true;
 
 var downloadList = [];
 
 var sendFiles = {}
 
 
+// Warning for unsupported download attribute in Safari
+var isSafari = (navigator.userAgent.indexOf('Safari') != -1
+             && navigator.userAgent.indexOf('Chrome') == -1);
+var safariSupported = [ 'pdf', 'jpg', 'png', 'txt', 'mp3' ];
+var safariWarn = true;
+
 $.getScript("js/binary.min.js" );  
 $.getScript("js/jszip.min.js" );  
 $.getScript("js/filesaver.min.js" );  
+
+
+function error(title, msg) {
+  $('#errorModalTitle').html(title);
+  $('#errorModalText').html(msg);
+  $('#errorModal').modal();
+}
 
 function sendNextFile() {
   console.log(sendFiles.list);
@@ -48,7 +61,20 @@ function addSentFile(name, size) {
 }
 
 function addReceivedFile(name, size, url) {
-  a = '<a href="'+url+'" download="'+name+'" target="_blank">'+name+'</a>';
+  ext = name.split('.').pop();
+
+  // Hande unsupported files on Safari
+  if (isSafari && $.inArray(ext, safariSupported) == -1 ) {
+    if (safariWarn) {
+      msg = "Due to a bug in Safari, only a few filetypes are supported. \
+          For full functionality, please use another browser, like Chrome or Firefox.<br /><br /> \
+          Supported types: " + safariSupported.join(', ');
+      error('Unsupported filetype in Safari', msg);
+      safariWarn = false;
+    }
+    a = name;
+  } else
+    a = '<a href="'+url+'" download="'+name+'" target="_blank">'+name+'</a>';
   html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
   
   $('#receivedTable tr:last').before(html);
@@ -105,7 +131,6 @@ function formatKey(key) {
 }
 
 function initiate() {
-  
   generateKeyPair();
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
@@ -271,11 +296,9 @@ function generateKeyPair() {
     if (echoTest) {
       remotePubKey = pubKey;
       initWorker();
-      initiate();
       $('.carousel').carousel(4);
       $('#privKey').text(formatKey(privKey));
       $('#remotePubKey').text(formatKey(remotePubKey));
-      $('#keysModal').modal();
     }
   })
 }
