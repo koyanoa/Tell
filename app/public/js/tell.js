@@ -1,4 +1,4 @@
-var bcUrl = 'ws://' + window.location.hostname + ':62938';
+var bcUrl = 'wss://' + window.location.hostname + ':62938';
 
 var privKey, pubKey, remotePubKey;
 
@@ -15,7 +15,7 @@ var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
 MAX_FILE_SIZE = 20*1024*1024;
 
 
-var echoTest = true;
+var echoTest = false;
 
 var downloadList = [];
 
@@ -151,6 +151,14 @@ function initiate() {
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
 
+  bc.on('error', function (err) {
+        error('BinaryJS client error', err, true);
+  });
+
+  bc.on('close', function () {
+        error('Connection closed', 'BinaryJS client disconnected.', true);
+  });
+
   bc.on('stream', function(stream, meta){
     if (meta.action == 'file') {
       receiveStatus("Receive...");
@@ -161,6 +169,10 @@ function initiate() {
     var parts = [];
     stream.on('data', function(data){
       parts.push(data);
+    });
+
+    stream.on('error', function (err) {
+        error('Send error', err);
     });
 
     stream.on('end', function(){
@@ -194,11 +206,24 @@ function initiate() {
           $('#fileInputText').val('');
           break;
         case 'error':
-          if (meta.value == 'id') $('#wrongIdModal').modal();
+          if (meta.value == 'id')
+            error('Sorry, wrong number.',
+                '<div class="text-left">It seems you entered a wrong number. \
+                  <ul> \
+                    <li>The number is necessary to establish a secure channel between you and the other person.</li> \
+                    <li>As you\'re on this page, the other person has to give you this number to enter, for example by phone.</li> \
+                    <li>It has six digits between 0 and 9.</li> \
+                  </ul> \
+                  </div>'
+            );
           else console.log('Some error received from server');
           break;
         case 'close':
-          $('#connectionClosed').modal();
+          error(
+              'Connection closed.',
+              'The other person has left the channel. To send files again, create a new session.',
+              true
+          );
           break;
       }
     });
