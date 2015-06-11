@@ -57,9 +57,13 @@ input[readonly] {
 }
 
 /* Join page styles */
+.idGroup {
+  margin: auto;
+  width: 180px;
+}
+
 #idInput {
   font-size:150%;
-  width: 130px;
   text-align:center;
   letter-spacing:+4px;
   color: #168ccc;
