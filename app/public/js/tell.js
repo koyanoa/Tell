@@ -242,6 +242,10 @@ function initWorker() {
   
   w = new Worker('js/tell.worker.js');
 
+  w.addEventListener('error', function(err) { 
+    error('WebWorker error', err, true);
+  }, false);
+
   w.onmessage = function (event, data) {
     var msg = event.data;
 
