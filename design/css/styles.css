@@ -172,9 +172,37 @@ footer .nav>li>a:hover {
 }
 
 .glyphsize {
-    font-size: 60px;
+  font-size: 60px;
+}
+
+#help .glyphsize {
+  color:#168ccc;
 }
 
 .tellNow {
   font-style: italic;
+}
+
+.helpEmph {
+  color: #279ddd;
+}
+
+#help p {
+  font-size:1.2em;
+}
+
+.helpGlyph {
+  padding:0 50px 0 50px;
+  margin:30px 0 10px 0;
+}
+
+.helpArrow {
+  margin-top:110px;
+  font-size:30px;
+}
+
+.helpNr {
+  float:left;
+  font-size:2.5em;
+  padding:0 10px 0 0;
 }

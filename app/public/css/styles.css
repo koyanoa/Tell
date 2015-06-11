@@ -11,6 +11,7 @@ author: bootply.com
 
 html,body {
 	height:100%;
+    background:center no-repeat fixed url('/assets/example/bg_suburb.jpg');
     background-size: cover;
 }
 
@@ -136,7 +137,8 @@ footer .nav>li>a:hover {
 .arrow-container{
   position:absolute;
   bottom:50px;
-  width:97%;
+  margin-left:-15px;
+  width:100%;
   text-align:center;
 }
 
@@ -152,11 +154,55 @@ footer .nav>li>a:hover {
   color:#168ccc;
 }
 
-#contactLink {
-  font-size:2em;
+#contactLink{
   color:#ddd;
 }
 
-.glyphicon.glyphicon_about {
-    font-size: 60px;
+#contactLink:hover{
+    color:#38afef;
+    text-decoration:none !important
+}
+
+
+
+.slider {
+   margin:-20px 0 0 0;
+   padding:0px;
+   height:0px;
+}
+
+.glyphsize {
+  font-size: 60px;
+}
+
+#help .glyphsize {
+  color:#168ccc;
+}
+
+.tellNow {
+  font-style: italic;
+}
+
+.helpEmph {
+  color: #279ddd;
+}
+
+#help p {
+  font-size:1.2em;
+}
+
+.helpGlyph {
+  padding:0 50px 0 50px;
+  margin:30px 0 10px 0;
+}
+
+.helpArrow {
+  margin-top:110px;
+  font-size:30px;
+}
+
+.helpNr {
+  float:left;
+  font-size:2.5em;
+  padding:0 10px 0 0;
 }
