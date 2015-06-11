@@ -95,6 +95,11 @@ function bytesToSize(bytes) {
     return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
 };
 
+function formatKey(key) {
+  key = key.primaryKey.fingerprint.toUpperCase();
+  // Split in parts of 4
+  return key.match(/.{1,4}/g).join(' ');
+}
 
 function initiate() {
   // Connect to BinaryJS
@@ -124,8 +129,8 @@ function initiate() {
           $('.carousel').carousel(4);
           
           // update key display
-          $('#privKey').text(privKey.primaryKey.fingerprint);
-          $('#remotePubKey').text(remotePubKey.primaryKey.fingerprint);
+          $('#privKey').text(formatKey(privKey));
+          $('#remotePubKey').text(formatKey(remotePubKey));
 
           initWorker();
           break;
@@ -250,8 +255,9 @@ function generateKeyPair() {
       initWorker();
       initiate();
       $('.carousel').carousel(4);
-      $('#privKey').text(privKey.primaryKey.fingerprint);
-      $('#remotePubKey').text(remotePubKey.primaryKey.fingerprint);
+      $('#privKey').text(formatKey(privKey));
+      $('#remotePubKey').text(formatKey(remotePubKey));
+      $('#keysModal').modal();
     }
   })
 }
