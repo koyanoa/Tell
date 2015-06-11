@@ -9,15 +9,35 @@ var w, bc;
 var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
     RANDOM_SEED_REQUEST = 20000; // random bytes seeded after worker request
 
+MAX_FILE_SIZE = 20*1024*1024;
+
 
 var echoTest = false;
 
 var downloadList = [];
 
+var sendFiles = {}
+
 
 $.getScript("js/binary.min.js" );  
 $.getScript("js/jszip.min.js" );  
 $.getScript("js/filesaver.min.js" );  
+
+function sendNextFile() {
+  console.log(sendFiles.list);
+  for(var file; file=sendFiles.list[sendFiles.idx]; sendFiles.idx++) {
+    if (file.size <= MAX_FILE_SIZE) {
+      w.postMessage({
+        action: 'encrypt',
+        file: file,
+      });
+      sendFiles.idx++;
+      return true;
+    }
+  }
+  return false
+}
+    
 
 function addSentFile(name, size) {
   html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
@@ -47,8 +67,7 @@ function inputSendStyle(){
   $('#fileInputText').prop('disabled', true);
 }
 
-function resetInputStyle() {
-  $('#fileInputText').val('');
+function enableFileInput() {
   $('#fileSendButton').prop('disabled', false);
   $('#fileInput').prop('disabled', false);
   $('#fileInputText').prop('disabled', false);
@@ -127,7 +146,7 @@ function initiate() {
           }, parts);
           break;
         case 'received':
-          resetInputStyle();
+          $('#fileInputText').val('');
           break;
         case 'error':
           if (meta.value == 'id') $('#wrongIdModal').modal();
@@ -152,6 +171,10 @@ function initWorker() {
         bc.send(msg.data, { action: 'file' });
         if (echoTest) bc.send(noFile, { action: 'received' });
         addSentFile(msg.name, msg.size);
+
+        if (!sendNextFile()) {
+          enableFileInput();
+        }
         break;
       case 'decrypted':
         var data = new Blob([ msg.data ], {type : msg.type});
@@ -202,8 +225,10 @@ function initWorker() {
 function generateKeyPair() {
   console.log('Generating keypair...');
 
-  openpgp.config.useWebCrypto = false;
-  openpgp.initWorker('js/openpgp.worker.js');
+  if (!echoTest) {
+    openpgp.config.useWebCrypto = false;
+    openpgp.initWorker('js/openpgp.worker.js');
+  }
 
   var options = {
     numBits: 2048,
@@ -252,10 +277,10 @@ $("#tellApp").load("ui.html", function() {
   $('#fileSendButton').click(function() {
     if ($('#fileInputText').val() != '') {
       inputSendStyle();
-      w.postMessage({
-        action: 'encrypt',
-        files: $('#fileInput').prop('files'),
-      });
+
+      sendFiles.list = $('#fileInput').prop('files');
+      sendFiles.idx = 0;
+      sendNextFile();
     }
   });
 

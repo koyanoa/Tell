@@ -30,6 +30,7 @@ window.openpgp.crypto.random.randomBuffer.init(MAX_SIZE_RANDOM_BUFFER);
 self.onmessage = function (event, data) {
   var msg = event.data;
 
+  console.log(msg);
   switch (msg.action) {
     case 'seed-random':
       if (!(msg.buf instanceof Uint8Array)) {
@@ -46,73 +47,57 @@ self.onmessage = function (event, data) {
 
     case 'encrypt':
       // Sign, encrypt and send selected files
-      var files = msg.files;
+      var file = msg.file;
+      var name = file.name;
       
-      function encryptFile(idx) {
-        var file = files[idx];
-        var name = file.name;
+      var reader = new FileReaderSync();
+      var result = reader.readAsBinaryString(file);
 
-        var reader = new FileReader();
+      var msg = window.openpgp.message.fromBinary(result);
+      var meta = JSON.stringify({ name: name, type: file.type});
+      msg.packets[0].setFilename(meta);
+      
+      workingFilename = name;
+      
+      status('sign');
+      msg = msg.sign([privKey]);
+      
+      status('encrypt');
+      msg = msg.encrypt([remotePubKey]);
 
-        reader.onloadend = function () {
-          var msg = window.openpgp.message.fromBinary(reader.result);
-          meta = JSON.stringify({ name: name, type: file.type});
-          msg.packets[0].setFilename(meta);
-          workingFilename = name;
-          
-          status('sign');
-          msg = msg.sign([privKey]);
-          
-          status('encrypt');
-          msg = msg.encrypt([remotePubKey]);
+      status('send');
+      var data = str2ab(msg.packets.write());
+      response({ action: 'encrypted', name: name, size: file.size, data: data }, [data]);
 
-          status('send');
-          var data = str2ab(msg.packets.write());
-          response({ action: 'encrypted', name: name, size: file.size, data: data }, [data]);
-
-          workingFilename = '';
-          status('finished');
-
-          if (idx < files.length-1)
-            encryptFile(idx+1);
-        }
-
-        if (file.size <= MAX_FILE_SIZE)
-          reader.readAsBinaryString(file);
-        else if (idx < files.length-1)
-            encryptFile(idx+1);
-      }
-
-      encryptFile(0);
+      workingFilename = '';
+      status('finished');
       break;
 
     case 'decrypt':
-      var reader = new FileReader();
+      var reader = new FileReaderSync();
+      result = reader.readAsBinaryString(new Blob(msg.data));
 
-      reader.onloadend = function() {
-        var packetlist = new window.openpgp.packet.List();
-        packetlist.read(reader.result);
+      var packetlist = new window.openpgp.packet.List();
+      packetlist.read(result);
 
-        var msg = new window.openpgp.message.Message(packetlist);
+      var msg = new window.openpgp.message.Message(packetlist);
 
-        status('decrypt');
-        msg = msg.decrypt(privKey);
+      status('decrypt');
+      msg = msg.decrypt(privKey);
 
-        var meta = JSON.parse(msg.packets[1].getFilename());
+      var meta = JSON.parse(msg.packets[1].getFilename());
 
-        status('verify');
-        var verified = msg.verify([remotePubKey])[0].valid
-        console.log("verified: " + verified);
-        
-        status('decrypted');
+      status('verify');
+      var verified = msg.verify([remotePubKey])[0].valid
+      console.log("verified: " + verified);
+      
+      status('decrypted');
 
-        // Display verified file in browser
-        if (verified == true) {
-          var data = str2ab(msg.getLiteralData());
-          response({ action: 'decrypted', name: meta.name, type: meta.type, data: data }, [data]);
-        }
+      // Display verified file in browser
+      if (verified == true) {
+        var data = str2ab(msg.getLiteralData());
+        response({ action: 'decrypted', name: meta.name, type: meta.type, data: data }, [data]);
       }
-      reader.readAsBinaryString(new Blob(msg.data));
   }
 }
 
