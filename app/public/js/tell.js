@@ -192,6 +192,8 @@ function initiate() {
           break;
         case 'match':
           $('.carousel').carousel(4);
+          $('#section2').hide();
+          $('#questionSign').hide();
           $('#keyGen').modal( {'backdrop':'static'} );
           matched = true;
           sendPubKey();
