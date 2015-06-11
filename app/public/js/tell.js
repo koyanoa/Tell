@@ -33,10 +33,26 @@ $.getScript("js/jszip.min.js" );
 $.getScript("js/filesaver.min.js" );  
 
 
-function error(title, msg) {
+function error(title, msg, crit) {
+  crit = crit || false;
+
   $('#errorModalTitle').html(title);
   $('#errorModalText').html(msg);
-  $('#errorModal').modal();
+
+  if (crit) {
+    $('#errorModalClose').hide();
+    $('#errorModalRestart').show();
+    options = {
+      'backdrop':'static', 
+      'keyboard': false
+    };
+  } else {
+    $('#errorModalClose').show();
+    $('#errorModalRestart').hide();
+    options = {};
+  }
+
+  $('#errorModal').modal(options);
 }
 
 function sendNextFile() {
@@ -300,7 +316,9 @@ function generateKeyPair() {
       $('#privKey').text(formatKey(privKey));
       $('#remotePubKey').text(formatKey(remotePubKey));
     }
-  })
+  }).catch(function(error) {
+    error('Error generating PGP Keypair', error, true);
+});
 }
 
 $("#tellApp").load("ui.html", function() {
