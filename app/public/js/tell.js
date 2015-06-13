@@ -17,7 +17,7 @@ MAX_FILE_SIZE = 20*1024*1024;
 
 var echoTest = false;
 
-var downloadList = [];
+var receivedFiles = {};
 
 var sendFiles = {}
 
@@ -81,7 +81,7 @@ function addSentFile(name, size) {
   $('#sentTable tr:last').after(html);
 }
 
-function addReceivedFile(name, size, url) {
+function addReceivedFile(name, size) {
   ext = name.split('.').pop();
 
   // Hande unsupported files on Safari
@@ -95,10 +95,17 @@ function addReceivedFile(name, size, url) {
     }
     a = name;
   } else
-    a = '<a href="'+url+'" download="'+name+'" target="_blank">'+name+'</a>';
+    a = '<a onclick="downloadFile(\''+name+'\')" href="#">'+name+'</a>';
   html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
+  console.log(receivedFiles);
   
   $('#receivedTable tr:last').before(html);
+}
+
+function downloadFile(name) {
+  file = receivedFiles[name]
+  data = new Blob([ file.data ], {type : file.type});
+  saveAs(data, name);
 }
 
 function receiveStatus(msg) {
@@ -267,11 +274,11 @@ function initWorker() {
         }
         break;
       case 'decrypted':
-        var data = new Blob([ msg.data ], {type : msg.type});
-        var url = (window.URL || window.webkitURL).createObjectURL(data);
-
-        addReceivedFile(msg.name, data.size, url);
-        downloadList.push({name: msg.name, data: msg.data });
+        receivedFiles[msg.name] = {
+          data: msg.data,
+          type: msg.type,
+        };
+        addReceivedFile(msg.name, msg.data.byteLength);
         break;
       case 'request-seed':
         seedRandom(RANDOM_SEED_REQUEST);
@@ -325,7 +332,7 @@ function generateKeyPair() {
 
   if (!echoTest) {
     openpgp.config.useWebCrypto = false;
-    openpgp.initWorker('js/openpgp.worker.js');
+    openpgp.initWorker('js/openpgp.worker.min.js');
   }
 
   var options = {
@@ -391,9 +398,8 @@ $("#tellApp").load("ui.html", function() {
 
   $( "#downloadAllButton" ).click(function() {
     var zip = new JSZip();
-    for (i in downloadList) {
-      file = downloadList[i];
-      zip.file(file.name, file.data);
+    for (var name in receivedFiles) {
+      zip.file(name, receivedFiles[name].data);
     }
     saveAs(zip.generate({type : "blob"}), 'Tell-Now-Files.zip');
   });

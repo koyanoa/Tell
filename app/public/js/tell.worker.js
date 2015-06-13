@@ -21,6 +21,23 @@ function str2ab(str) {
   return buf;
 }
 
+function ab2str(buffer) {
+  var binary = "";
+  var bytes = new Uint8Array(buffer);
+  var length = bytes.byteLength;
+  for (var i = 0; i < length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return binary;
+}
+// Workaround for non-existing readAsBinaryString in IE
+function readAsBinaryString(file) {
+  var reader = new FileReaderSync();
+  if (reader.readAsBinaryString)
+    return reader.readAsBinaryString(file);
+  else 
+    return ab2str(reader.readAsArrayBuffer(file));
+}
 
 var MIN_SIZE_RANDOM_BUFFER = 40000;
 var MAX_SIZE_RANDOM_BUFFER = 60000;
@@ -49,9 +66,8 @@ self.onmessage = function (event, data) {
       // Sign, encrypt and send selected files
       var file = msg.file;
       var name = file.name;
-      
-      var reader = new FileReaderSync();
-      var result = reader.readAsBinaryString(file);
+
+      var result = readAsBinaryString(file);
 
       var msg = window.openpgp.message.fromBinary(result);
       var meta = JSON.stringify({ name: name, type: file.type});
@@ -74,8 +90,7 @@ self.onmessage = function (event, data) {
       break;
 
     case 'decrypt':
-      var reader = new FileReaderSync();
-      result = reader.readAsBinaryString(new Blob(msg.data));
+      var result = readAsBinaryString(new Blob(msg.data));
 
       var packetlist = new window.openpgp.packet.List();
       packetlist.read(result);
