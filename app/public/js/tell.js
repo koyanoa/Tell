@@ -403,6 +403,8 @@ $("#tellApp").load("ui.html", function() {
     }
     saveAs(zip.generate({type : "blob"}), 'Tell-Now-Files.zip');
   });
+  
+  if (isSafari) $("#downloadAllButton").hide();
 
   // Special File button handling
   $('.btn-file :file').on('fileselect', function(event, numFiles, label) {
