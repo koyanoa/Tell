@@ -360,11 +360,17 @@ $("#tellApp").load("ui.html", function() {
   $('#createButton').click(function() {
     bc.send(noFile, { action: 'start' });
   });
+  
+  $('#carousel').on('slid.bs.carousel', function (event) {
+    if (event.relatedTarget.id == 'selectPage')
+      $('#idInput').focus();
+  })
 
-  $('#connectButton').click(function() {
+  $('#connectForm').submit(function(event) {
     var id = $('#idInput').val();
     console.log('Enter with id: ', id);
     bc.send(noFile, { action: 'join', value: id })
+    event.preventDefault();
   });
 
   $('#fileSendButton').click(function() {
