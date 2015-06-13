@@ -204,7 +204,6 @@ function initiate() {
           $('#section2').hide();
           $('#questionSign').hide();
           $('#keyGen').modal( {'backdrop':'static'} );
-          setTimeout(function(){ generateKeyPair(); }, 500);
           break;
         case 'file':
           w.postMessage({
@@ -362,9 +361,16 @@ $("#tellApp").load("ui.html", function() {
   });
   
   $('#carousel').on('slid.bs.carousel', function (event) {
-    if (event.relatedTarget.id == 'selectPage')
-      $('#idInput').focus();
-  })
+    id = event.relatedTarget.id;
+    switch (id) {
+      case 'selectPage':
+        $('#idInput').focus();
+        break;
+      case 'main':
+        generateKeyPair();
+        break;
+    }
+  });
 
   $('#connectForm').submit(function(event) {
     var id = $('#idInput').val();
