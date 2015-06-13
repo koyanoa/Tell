@@ -6,8 +6,6 @@ var noFile = new ArrayBuffer(0);
 
 var w, bc;
 
-var keysGenerated = false;
-var matched = false;
 
 var INITIAL_RANDOM_SEED = 50000, // random bytes seeded to worker
     RANDOM_SEED_REQUEST = 20000; // random bytes seeded after worker request
@@ -159,7 +157,6 @@ function formatKey(key) {
 }
 
 function initiate() {
-  generateKeyPair();
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
 
@@ -207,8 +204,7 @@ function initiate() {
           $('#section2').hide();
           $('#questionSign').hide();
           $('#keyGen').modal( {'backdrop':'static'} );
-          matched = true;
-          sendPubKey();
+          setTimeout(function(){ generateKeyPair(); }, 500);
           break;
         case 'file':
           w.postMessage({
@@ -316,24 +312,8 @@ function initWorker() {
   });
 }
 
-
-function sendPubKey(){
-  // Announce public key over BinaryJS connection when matched and keys are fully generated
-  if (matched == true && keysGenerated == true) {
-    var data = str2ab(pubKey.toPacketlist().write());
-    bc.send(data, { action: 'pubKey' });
-    tryInitWorker();
-  }
-}
-
-
 function generateKeyPair() {
   console.log('Generating keypair...');
-
-  if (!echoTest) {
-    openpgp.config.useWebCrypto = false;
-    openpgp.initWorker('js/openpgp.worker.min.js');
-  }
 
   var options = {
     numBits: 2048,
@@ -348,8 +328,10 @@ function generateKeyPair() {
     // Display fingerprint
     $('#privKey').text(formatKey(privKey));
     console.log('Generated keypair');
-    keysGenerated = true;
-    sendPubKey();
+    
+    var data = str2ab(pubKey.toPacketlist().write());
+    bc.send(data, { action: 'pubKey' });
+    tryInitWorker();
 
     // For local testing
     if (echoTest) {
@@ -365,7 +347,6 @@ function generateKeyPair() {
 }
 
 $("#tellApp").load("ui.html", function() {
-
   $('#startButton').click(function() {
     if (mobileAndTabletcheck())
       error(
