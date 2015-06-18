@@ -130,3 +130,11 @@ input[readonly] {
 #hideSendRequest span {
   font-size:300%;
 }
+
+
+
+@media (max-width: 768px) {
+  .item .container {
+    width: auto;  
+  }
+}
