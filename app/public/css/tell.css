@@ -47,10 +47,6 @@ input[readonly] {
   height: 500px;
 }
 
-#fileList {
-  overflow: auto;      
-}
-
 .pad {
   padding: 3px;
 }
@@ -111,20 +107,25 @@ input[readonly] {
   padding-top:250px;
 }
 
-#files {
-  height:250px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
 #hideReceive {
   display:none;
 }
+#hideReceive .row {
+  height: 50px;
+  padding-top: 10px;
+}
+#fileList {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 300px;
+}
+
 
 #hideSendRequest {
   display:none;
   padding-top:50px;
   font-size:150%;
+  height: 350px;
 
 }
 #hideSendRequest span {
