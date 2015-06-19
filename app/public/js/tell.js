@@ -39,7 +39,7 @@ function mobileAndTabletcheck () {
 function error(title, msg, crit) {
   crit = crit || false;
 
-  $('#errorModalTitle').html(title);
+  $('#errorModalTitle').text(title);
   $('#errorModalText').html(msg);
 
   if (crit) {
@@ -75,12 +75,14 @@ function sendNextFile() {
     
 
 function addSentFile(name, size) {
-  html = '<tr><td>' + name + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
-  $('#sentTable tr:last').after(html);
+	var row = $('<tr>');
+	row.append($('<td>').text(name));
+	row.append($('<td class="text-right">').text(bytesToSize(size)));
+  row.appendTo('#sentTable');
 }
 
 function addReceivedFile(name, size) {
-  ext = name.split('.').pop();
+  var ext = name.split('.').pop();
 
   // Hande unsupported files on Safari
   if (isSafari && $.inArray(ext, safariSupported) == -1 ) {
@@ -91,13 +93,16 @@ function addReceivedFile(name, size) {
       error('Unsupported filetype in Safari', msg);
       safariWarn = false;
     }
-    a = name;
-  } else
-    a = '<a onclick="downloadFile(\''+name+'\')" href="#">'+name+'</a>';
-  html = '<tr><td>' + a + '</td><td class="text-right">' + bytesToSize(size) + '</td></tr>';
-  console.log(receivedFiles);
+    var tdA = $('<td>').text(a)
+  } else {
+		var a = $('<a href="#">').text(name).click(function() { downloadFile(name) });
+    var tdA = $('<td>').append(a)
+	}
   
-  $('#receivedTable tr:last').before(html);
+	var row = $('<tr>');
+	row.append(tdA);
+	row.append($('<td class="text-right">').text(bytesToSize(size)));
+  $('#receiveStatus').parent().before(row);
 }
 
 function downloadFile(name) {
@@ -346,6 +351,11 @@ function generateKeyPair() {
 }
 
 $("#tellApp").load("ui.html", function() {
+	if (echoTest) {
+		initiate();
+	 	generateKeyPair();
+	}
+
   $('#startButton').click(function() {
     if (mobileAndTabletcheck())
       error(
