@@ -1,4 +1,4 @@
-var baseUrl = window.location.hostname;
+var baseUrl = window.location.hostname + ':62938';
 var bcUrl = 'wss://' + baseUrl;
 
 var privKey, pubKey, remotePubKey;
