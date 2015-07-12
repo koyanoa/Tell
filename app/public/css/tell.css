@@ -164,6 +164,11 @@ input[readonly] {
   padding:0 10px 0 0;
 }
 
+#urlInput {
+	width: 300px;
+	margin: auto;
+}
+
 
 @media (max-width: 768px) {
   .item .container {

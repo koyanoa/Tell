@@ -1,4 +1,5 @@
-var bcUrl = 'wss://' + window.location.hostname + ':62938';
+var baseUrl = window.location.hostname + ':62938';
+var bcUrl = 'wss://' + baseUrl;
 
 var privKey, pubKey, remotePubKey;
 
@@ -26,9 +27,9 @@ var isSafari = (navigator.userAgent.indexOf('Safari') != -1
 var safariSupported = [ 'pdf', 'jpg', 'png', 'txt', 'mp3' ];
 var safariWarn = true;
 
-$.getScript("js/binary.min.js" );  
-$.getScript("js/jszip.min.js" );  
-$.getScript("js/filesaver.min.js" );  
+$.getScript("/js/binary.min.js" );  
+$.getScript("/js/jszip.min.js" );  
+$.getScript("/js/filesaver.min.js" );  
 
 function mobileAndTabletcheck () {
   var check = false;
@@ -161,16 +162,25 @@ function formatKey(key) {
   return key.match(/.{1,4}/g).join(' ');
 }
 
-function initiate() {
+function initiate(id) {
+  id = id || false;
+
   // Connect to BinaryJS
   bc = new BinaryClient(bcUrl);
 
   bc.on('error', function (err) {
-        error('BinaryJS client error', err, true);
+    error('BinaryJS client error', err, true);
   });
 
   bc.on('close', function () {
-        error('Connection closed', 'BinaryJS client disconnected.', true);
+		error('Connection closed', 'BinaryJS client disconnected.', true);
+  });
+
+  bc.on('open', function () {
+		if (id) {
+			console.log('Enter with id: ', id);
+			bc.send(noFile, { action: 'join', value: id })
+		}
   });
 
   bc.on('stream', function(stream, meta){
@@ -192,7 +202,13 @@ function initiate() {
     stream.on('end', function(){
       switch (meta.action) {
         case 'id':
-          $('#id').text(meta.value);
+					var id = meta.value;
+					var url = 'https://' + baseUrl + '/session/' + id;
+          $('#id').text(id);
+          $('#url').val(url);
+          $('#urlMail').prop('href', 
+							"mailto:?subject=Tell%20Now%20Session&body=Hey%2C%0A%0AI%20want%20to%20send%20you%20encrypted%20file%20with%20'Tell%20Now'%2C%20just%20visit%20this%20link%3A%0A%0A" + url + "%0A%0ACheers%2C%0A"
+							);
           break;
         case 'pubKey':
           // Read remote public key
@@ -254,7 +270,7 @@ function tryInitWorker() {
 
 function initWorker() {
   
-  w = new Worker('js/tell.worker.js');
+  w = new Worker('/js/tell.worker.js');
 
   w.addEventListener('error', function(err) { 
     error('WebWorker error', err, true);
@@ -350,7 +366,7 @@ function generateKeyPair() {
 });
 }
 
-$("#tellApp").load("ui.html", function() {
+$("#tellApp").load("/ui.html", function() {
 	if (echoTest) {
 		initiate();
 	 	generateKeyPair();
@@ -408,6 +424,15 @@ $("#tellApp").load("ui.html", function() {
   });
   
   if (isSafari) $("#downloadAllButton").hide();
+
+
+	// Session URL handling
+	path = window.location.pathname.split('/');
+	if (path[1] == 'session') {
+		id = path[2];
+		initiate(id);
+	}
+
 
   // Special File button handling
   $('.btn-file :file').on('fileselect', function(event, numFiles, label) {
