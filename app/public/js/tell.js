@@ -27,9 +27,17 @@ var isSafari = (navigator.userAgent.indexOf('Safari') != -1
 var safariSupported = [ 'pdf', 'jpg', 'png', 'txt', 'mp3' ];
 var safariWarn = true;
 
-$.getScript("/js/binary.min.js" );  
 $.getScript("/js/jszip.min.js" );  
 $.getScript("/js/filesaver.min.js" );  
+$.getScript("/js/binary.min.js", function() {
+	// Session URL handling
+	path = window.location.pathname.split('/');
+	if (path[1] == 'session') {
+		id = path[2];
+
+		initiate(id);
+	}
+});  
 
 function mobileAndTabletcheck () {
   var check = false;
@@ -424,14 +432,6 @@ $("#tellApp").load("/ui.html", function() {
   });
   
   if (isSafari) $("#downloadAllButton").hide();
-
-
-	// Session URL handling
-	path = window.location.pathname.split('/');
-	if (path[1] == 'session') {
-		id = path[2];
-		initiate(id);
-	}
 
 
   // Special File button handling
