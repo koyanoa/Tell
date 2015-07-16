@@ -214,9 +214,6 @@ function initiate(id) {
 					var url = 'https://' + baseUrl + '/session/' + id;
           $('#id').text(id);
           $('#url').val(url);
-          $('#urlMail').prop('href', 
-							"mailto:?subject=Tell%20Now%20Session&body=Hey%2C%0A%0AI%20want%20to%20send%20you%20an%20encrypted%20file%20with%20'Tell%20Now'%2C%20just%20visit%20this%20link%3A%0A%0A" + url + "%0A%0ACheers%2C%0A"
-							);
           break;
         case 'pubKey':
           // Read remote public key
