@@ -30,13 +30,7 @@ var safariWarn = true;
 $.getScript("/js/jszip.min.js" );  
 $.getScript("/js/filesaver.min.js" );  
 $.getScript("/js/binary.min.js", function() {
-	// Session URL handling
-	path = window.location.pathname.split('/');
-	if (path[1] == 'session') {
-		id = path[2];
-
-		initiate(id);
-	}
+  $("#tellApp").load("/ui.html", runMain)
 });  
 
 function mobileAndTabletcheck () {
@@ -188,6 +182,8 @@ function initiate(id) {
 		if (id) {
 			console.log('Enter with id: ', id);
 			bc.send(noFile, { action: 'join', value: id })
+		} else {
+      $('.carousel').carousel(1);
 		}
   });
 
@@ -371,10 +367,17 @@ function generateKeyPair() {
 });
 }
 
-$("#tellApp").load("/ui.html", function() {
+function runMain() {
 	if (echoTest) {
 		initiate();
 	 	generateKeyPair();
+	}
+  
+	// Session URL handling
+	path = window.location.pathname.split('/');
+	if (path[1] == 'session') {
+		id = path[2];
+		initiate(id);
 	}
 
   $('#startButton').click(function() {
@@ -384,7 +387,6 @@ $("#tellApp").load("/ui.html", function() {
           'Sorry, this website has so far only been tested on desktop browsers and might not work as expected.'
       );
     initiate();
-    $('.carousel').carousel(1);
   });
 
   $('#createButton').click(function() {
@@ -450,4 +452,4 @@ $("#tellApp").load("/ui.html", function() {
         label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
     input.trigger('fileselect', [numFiles, label]);
   });
-});
+}
