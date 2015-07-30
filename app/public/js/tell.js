@@ -183,7 +183,7 @@ function initiate(id) {
 			console.log('Enter with id: ', id);
 			bc.send(noFile, { action: 'join', value: id })
 		} else {
-      $('.carousel').carousel(1);
+      $('#createButton').attr('disabled', false);
 		}
   });
 
@@ -387,6 +387,7 @@ function runMain() {
           'Sorry, this website has so far only been tested on desktop browsers and might not work as expected.'
       );
     initiate();
+    $('.carousel').carousel(1);
   });
 
   $('#createButton').click(function() {
